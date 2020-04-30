@@ -112,11 +112,61 @@ const _default = (str) => {
                 </Text>
             ))}
       </View>
-      <View style={[styles.bottomCard, {marginTop:30}]}>
-        <Text style={styles.bottomText}>{Contract.project_name}</Text>
+      <View style={[styles.bottomCard, {marginLeft:20, marginTop:30}]}>
+      <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Project Name</Text>
+            <Text style={[styles.bottomText, {fontSize:14}]}>{Contract.project_name}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Contract Type</Text>
+            <Text style={[styles.bottomText, {fontSize:14}]}>{Contract.contract_type} Contract</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Project Length</Text>
+            <Text style={[styles.bottomText, {fontSize:12}]}>{Contract.project_length}km</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>State</Text>
+            <Text style={styles.bottomText}>{Contract.state}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>LGA</Text>
+            <Text style={styles.bottomText}>{Contract.lga}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Zone</Text>
+            <Text style={styles.bottomText}>{Contract.zone}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Name of Contractor</Text>
+            <Text style={styles.bottomText}>{Contract.name_of_contractor}</Text>
+        </View>
       </View>
       <View style={styles.bottomCard}>
-        <Text></Text>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Contract Sum</Text>
+            <Text style={styles.bottomText}>₦{Contract.contract_sum}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+            <Text style={styles.subText}>Expected Percentage Delivery</Text>
+            <Text style={styles.bottomText}>{Contract.epd}%</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+        <Text style={styles.subText}>Current Percentage</Text>
+        <Text style={styles.bottomText}>{Contract.current_percentage}%</Text>
+        </View>
+          <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
+        <Text style={styles.subText}>Amount Paid So Far</Text>
+        <Text style={styles.bottomText}>₦{Contract.amount_paid_so_far}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}> 
+            <Text style={styles.subText}>Accumulated Daily Budget</Text>
+            <Text style={styles.bottomText}>₦{Contract.accumulated_daily_budget}</Text>
+        </View>
+        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}> 
+            <Text style={styles.subText}>Daily Contract Budget</Text>
+            <Text style={styles.bottomText}>₦{Contract.daily_contract_budget}</Text>
+        </View>
       </View>
 
       </ScrollView>
@@ -127,14 +177,23 @@ const styles = StyleSheet.create({
     bottomText: {
         fontFamily:'Candara',
         fontWeight:'bold',
-        color: "#727165",
+        fontSize:13,
+        color: "black",
         marginLeft:10,
         marginTop:10
+    },  
+    subText: {
+        fontFamily:'Candara',
+        fontWeight:'bold',
+        fontSize:11,
+        color: "black",
+        marginLeft:10,
+        marginTop:12
     },  
     bottomCard: {
         width:'90%',
         backgroundColor:'white',
-        height:200,
+        height:210,
         marginLeft:'auto',
         marginRight:'auto',
         marginBottom:20,
