@@ -81,6 +81,10 @@ target 'cohims' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'rn-fetch-blob', :path => '../node_modules/rn-fetch-blob'
+
+  pod 'ReactNativeGetLocation', :path => '../node_modules/react-native-get-location'
+
   target 'cohimsTests' do
     inherit! :complete
     # Pods for testing
