@@ -11,6 +11,7 @@ import DatasheetScreen from './src/screens/DatasheetScreen';
 import UploadMenu from './src/screens/UploadMenu';
 import Project from './src/screens/Project';
 import SelectDatasheet from './src/screens/SelectDatasheet';
+import SelectedLocalDatasheet from './src/screens/SelectedLocalDatasheet';
 
 const AppNavigator = createStackNavigator(
   {
@@ -23,6 +24,7 @@ const AppNavigator = createStackNavigator(
     DatasheetScreen:DatasheetScreen,
     Project:Project,
     SelectDatasheet:SelectDatasheet,
+    SelectedLocalDatasheet:SelectedLocalDatasheet
   },{
     headerMode: 'none'
   }

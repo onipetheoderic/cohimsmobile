@@ -37,37 +37,75 @@ const HighwayMenu = (props) => {
         let type = props.navigation.getParam('type', null)
         let id = props.navigation.getParam('id', null);
         let title = props.navigation.getParam('title', null)
-        setType(type);
+        let token = props.navigation.getParam('token',null);      
+        setToken(token);      
         setTitle(title);
-        setId(id)
-
-        let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
-        dataSheetArray().then((val) => {
-          if (val) {
-            let Datasheets = JSON.parse(val)
-            console.log("DDDDD",Datasheets)
-            setSavedDatasheet(Datasheets)          
-          }
-        })
+        setId(id);
+        
         uploadInspectionDatasheet(id, type).then((data)=>{
             changeLength(data.length)
-            if(data.new===false){             
+            console.log("datass obtained",data.newdata)
+            if(data.newdata===false){  
+                let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
+                    dataSheetArray().then((val) => {
+                    if (val) {
+                        let Datasheets = JSON.parse(val)
+                        console.log("DDDDD",Datasheets)
+                        let all_datasheets = [];
+                        for(var i in Datasheets){
+                            if(data.type===Datasheets[i].type){
+                                console.log("its searching", Datasheets[i].type)
+                                all_datasheets.push(Datasheets[i]);
+                            }
+                            
+                        }
+                        setSavedDatasheet(all_datasheets)          
+                        }
+                    })
+                console.log("datasss",data.type)           
                 changeAllDatas(data.data)  
                 changeParameters(data.parameters)             
             }
-            else if(data.new===true){
+            else if(data.newdata===true){
                 changeAllDatas(data)
+                console.log("datasss new",data)
+                let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
+                    dataSheetArray().then((val) => {
+                    if (val) {
+                        let Datasheets = JSON.parse(val)
+                        console.log("DDDDD",Datasheets)
+                        let all_datasheets = [];
+                        for(var i in Datasheets){
+                            if(data.type===Datasheets[i].type){
+                                console.log("its searching", Datasheets[i].type)
+                                all_datasheets.push(Datasheets[i]);
+                            }
+                            
+                        }
+                        setSavedDatasheet(all_datasheets)          
+                        }
+                    })
+                setType(data.type);
             }
         })
                 
     }, []);
-
+    console.log("this isthe type", type)
     const isNew = all_datas.new===true?true:false
     function underscoreFormatter(str){
         let new_str = str.toUpperCase();
         return new_str.replace(/_/g, ' ');
     }
-console.log("state vals", )
+const gotoLocalReport = (obj, title) => {
+    console.log("selected obj",obj)
+    props.navigation.navigate('SelectedLocalDatasheet', {
+        datasheet:obj,
+        title:title,
+        contractId: id,
+        token: token
+    })
+}
+
   return (
     <>
       
@@ -76,6 +114,7 @@ console.log("state vals", )
 <Text style={{fontFamily:'Candara', textAlign:'center', fontSize:16}}>Kindly select from your local inspection datasheet below</Text>
 <View style={{marginBottom:70}}>
 {savedDatasheet.map((savedDatasheet, index) => (
+    <TouchableOpacity onPress={()=>gotoLocalReport(savedDatasheet,savedDatasheet.title)}>
     <View style={styles.cardStyle} key={savedDatasheet.id}>
         <View style={{marginLeft:20}}>
         <Text style={{fontFamily:'Candara', fontSize:17, color:'white'}}>{savedDatasheet.title}</Text>
@@ -83,6 +122,7 @@ console.log("state vals", )
         <Text style={{fontFamily:'Candara', fontSize:12, color:'white'}}>{underscoreFormatter(savedDatasheet.type)}</Text>
         </View>
     </View>
+    </TouchableOpacity>
     
 ))}
 

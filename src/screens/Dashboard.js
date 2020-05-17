@@ -1,5 +1,5 @@
 
-import React, {useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Alert, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as Animatable from 'react-native-animatable';
@@ -9,9 +9,10 @@ import {Colors} from '../components/colors'
 import SignInButton from '../components/signInButton';
 import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'  
 import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
-import {Foods} from '../api/foods'
+import {Foods} from '../api/foods';
+import {viewAllContracts, doSearchContract} from '../api/apiService';
 const data = [
-{ state: "o", earnings: 0 },
+  { state: "o", earnings: 0 },
   { state: "theo", earnings: 13000 },
   { state: "abia", earnings: 16500 },
   { state: "adamawa", earnings: 14250 },
@@ -50,8 +51,12 @@ const data = [
 const screenWidth = Dimensions.get("window").width;
 
 
-const LoginScreen = (props) => {
-    
+const DashboardScreen = (props) => {
+  const [housing, setHousing] = useState([]);
+  const [national, setNational] = useState([]);
+  const [works, setWorks] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [contracts, setContracts] = useState([])
     const { width, height } = Dimensions.get('window');
     setTimeout(() => {
         props.navigation.navigate('HomeScreen'); //this.props.navigation.navigate('Login')
@@ -75,6 +80,48 @@ const _default = (str) => {
     else return "No"
 }
 
+//viewAllContracts
+
+useEffect(() => {
+  setContracts([])
+    viewAllContracts().then((data) => {
+      console.log("all Datas", data)
+      let housing_data = data.housing;
+      let works_data = data.works;
+      let national_data = data.national;
+      setHousing(housing_data);
+      setNational(national_data);
+      setWorks(works_data)
+      console.log("housoing", housing_data);
+      console.log("works", works_data);
+      console.log("national", national_data);
+    })
+}, []);
+
+const setQuery = (val) => {
+ 
+  console.log(val.length)
+  setSearchValue(val);
+  let formData = new FormData();
+  formData.append("query", val)
+  if(val.length>=3){
+    doSearchContract(formData).then((data)=>{
+      console.log(data)
+      if(data.contracts.length && data.contracts.length>0){
+        setContracts(data.contracts)
+      }
+      else{
+        setContracts([])
+      }
+     
+    })
+  }
+  
+ 
+}
+
+
+console.log("list of works data", works)
   return (
 
     <ScrollView style={{backgroundColor:'white'}}>
@@ -95,21 +142,50 @@ const _default = (str) => {
           stroke: Colors.primaryGreen,strokeWidth: 1 }}}/>
         </VictoryChart>
       </ScrollView>
-
+      <View style={{marginVertical:30}}>
+        <View style={styles.textField}>
+            <TextInput
+             placeholderTextColor={Colors.mainGreen} 
+                placeholder="Search Contracts"
+                value={searchValue}
+                underlineColorAndroid="transparent"
+                style={{marginLeft:25, marginTop:3,fontFamily:'Candara'}}
+                onChangeText={(value) => {
+                    setQuery(value)                   
+                }}
+            />
+        </View>
+        {contracts.map((data,index)=>(
+         <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
+          id: data._id,
+          title: data.projectTitle,
+          type_of_project: data.contractType
+        })}>
+            <View style={{borderBottomWidth:1,height:30,
+              justifyContent:'center',
+              marginLeft:'auto', marginRight:'auto',width:'80%',
+            borderBottomColor:'rgb(202, 207, 210)'}}>
+              <Text style={{textAlign:'center',fontSize:15, fontFamily:'Candara'}}>{data.projectTitle}, {data.contractType}</Text>
+            </View>
+        </TouchableOpacity>
+        ))}
+       
+      </View>
 
       <View style={{marginLeft:10}}>
       <Text style={{fontFamily:'Candara', fontSize:20}}>All Roads and Bridges Contract</Text>
       </View>
       <ScrollView horizontal>
-          {Foods.map((contract) => (
+          {works.map((contract) => (
                <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
                 id: contract.id,
                 title: contract.project_title,
+                type_of_project: contract.type
               })}>
             <View style={[styles.eachCard, {backgroundColor:colorDeterminant(contract.contractor_default,contract.internal_default)}]}>
             <Text style={styles.title}>{contract.project_title}</Text>
             <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-            <Text style={styles.currentPercentage}>{contract.current_percentage}%</Text>
+            <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
             <Text style={styles.state}>{contract.contractor_name}</Text>
            <View style={{marginTop:20}}>
                 <Text style={styles.default}>Internal default:{_default(contract.internal_default)}</Text>
@@ -124,29 +200,47 @@ const _default = (str) => {
       <Text style={{fontFamily:'Candara', fontSize:20}}>All Housing Contract</Text>
       </View>
       <ScrollView horizontal>
-        <View style={styles.eachCard}>
-            
-        </View>
-        <View style={styles.eachCard}>
-            
+          {housing.map((contract) => (
+               <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
+                id: contract.id,
+                title: contract.project_title,
+                type_of_project: contract.type
+              })}>
+            <View style={[styles.eachCard, {backgroundColor:colorDeterminant(contract.contractor_default,contract.internal_default)}]}>
+            <Text style={styles.title}>{contract.project_title}</Text>
+            <Text style={styles.state}>{contract.state} {contract.lga}</Text>
+            <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
+            <Text style={styles.state}>{contract.contractor_name}</Text>
+           <View style={{marginTop:20}}>
+                <Text style={styles.default}>Internal default:{_default(contract.internal_default)}</Text>
+                <Text style={styles.default}>Contractor's default:{_default(contract.contractor_default)}</Text>
             </View>
-        <View style={styles.eachCard}>
-            
-        </View>
+            </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
         <View style={{marginLeft:10}}>
       <Text style={{fontFamily:'Candara', fontSize:20}}>All National Roads Contract</Text>
       </View>
       <ScrollView horizontal>
-        <View style={styles.eachCard}>
-            
-        </View>
-        <View style={styles.eachCard}>
-            
+          {national.map((contract) => (
+               <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
+                id: contract.id,
+                title: contract.project_title,
+                type_of_project: contract.type
+              })}>
+            <View style={[styles.eachCard, {backgroundColor:colorDeterminant(contract.contractor_default,contract.internal_default)}]}>
+            <Text style={styles.title}>{contract.project_title}</Text>
+            <Text style={styles.state}>{contract.state} {contract.lga}</Text>
+            <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
+            <Text style={styles.state}>{contract.contractor_name}</Text>
+           <View style={{marginTop:20}}>
+                <Text style={styles.default}>Internal default:{_default(contract.internal_default)}</Text>
+                <Text style={styles.default}>Contractor's default:{_default(contract.contractor_default)}</Text>
             </View>
-        <View style={styles.eachCard}>
-            
-        </View>
+            </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
         
       </ScrollView>
@@ -201,8 +295,9 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         marginLeft:'auto',
         marginRight:'auto',
+        marginBottom:10,
         borderRadius:26,
-        width:'85%',
+        width:'90%',
         
         shadowColor: "#000",
 shadowOffset: {
@@ -218,4 +313,4 @@ elevation: 8,
 
 
 
-export default LoginScreen;
+export default DashboardScreen;

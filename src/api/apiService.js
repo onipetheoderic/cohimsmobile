@@ -18,10 +18,66 @@ export async function allAssignedContracts(token) {
     }
 }
 
+
+
+export async function getSingleContract(id, type) {
+    console.log("Details sent",id, type)
+    console.log(`${baseUrl}get_single_contract/${id}/${type}`)
+    try {
+        let feeds = await fetch(`${baseUrl}get_single_contract/${id}/${type}`, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function viewAllContracts() {
+    try {
+        let feeds = await fetch(`${baseUrl}view_all_contract`, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+export async function doSearchContract(formData) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}seach_contract`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
 export async function doLogin(formData) {   
     
     try {
-        let feeds = await fetch('http://192.168.43.60:3300/api/login', {
+        let feeds = await fetch(`${baseUrl}login`, {
             method: 'post',
             body: formData,
             headers: {
@@ -221,11 +277,11 @@ export async function createFilePost(baseUrl, token, payload){
         console.warn('--' + e.message)
     }
 */ 
-export async function createPost(baseUrl, token, payload) {
+export async function DatasheetPost(token, payload) {
     try{
-        let feeds = await RNFetchBlob.fetch('POST', `${baseUrl}api/writePost`, {
+        let feeds = await RNFetchBlob.fetch('POST', `${baseUrl}datasheet_post`, {
           
-            Authorization : `Bearer ${token}`,
+            'Authorization' : `Bearer ${token}`,
             'Content-Type' : 'application/json',
             'Accept': 'application/json'
     

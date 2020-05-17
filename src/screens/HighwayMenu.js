@@ -62,7 +62,7 @@ const roadExist = road.length==0?false:true;
 const bridgeExist = bridge.length==0?false:true;
 const housingExist = housing.length==0?false:true;
 const nationalExist = national.length==0?false:true;
-console.log(housing)
+
   return (
     <>
       
@@ -83,6 +83,7 @@ console.log(housing)
               id: contract.id,
               type: "housing",
               title: contract.title,
+              token:token
             })}>
             <View style={[styles.eachCard]}>
               <Text style={styles.title}>{contract.title}</Text>
@@ -107,6 +108,7 @@ console.log(housing)
               id: contract.id,
               type: "bridge",
               title: contract.title,
+              token:token
             })}>
               <View style={[styles.eachCard]}>
                 <Text style={styles.title}>{contract.title}</Text>
@@ -131,6 +133,7 @@ console.log(housing)
               <TouchableOpacity onPress={() => props.navigation.navigate('SelectDatasheet', {
                 id: contract.id,
                 type: "road",
+                token:token,
                 title: contract.title,
               })}>
             <View style={[styles.eachCard]}>
@@ -156,6 +159,7 @@ console.log(housing)
                 id: contract.id,
                 type: "national",
                 title: contract.title,
+                token:token
               })}>
             <View style={[styles.eachCard]}>
               <Text style={styles.title}>{contract.title}</Text>

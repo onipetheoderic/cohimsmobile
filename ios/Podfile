@@ -85,6 +85,8 @@ target 'cohims' do
 
   pod 'ReactNativeGetLocation', :path => '../node_modules/react-native-get-location'
 
+  pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
+
   target 'cohimsTests' do
     inherit! :complete
     # Pods for testing
