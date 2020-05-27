@@ -1,41 +1,50 @@
 import React, { useState, createContext, useReducer } from "react";
-
+import AsyncStorage from '@react-native-community/async-storage';
 // Create Context Object
 const initialState = {
     count:0,
     selectedItems: [],
-    total:0
+    datasheetArray: [],
+    total:0,
+    isLoggedIn:false,
+    userDetails:null,
+    isSuper:false,
 };
 export const CounterContext = createContext(initialState);
 
 
 // Create a provider for components to consume and subscribe to changes
 export const CounterContextProvider = props => {
-//   const [count, setCount] = useState(0);
-//   const [products, changeProducts] = useState([]);
-//   const increment = () => {
-//     setCount(count + 1);
-//   };
-  
-//   const decrement = () => {
-//     setCount(count - 1);
-//   };
-
-
 
   const [state, dispatch] = useReducer((state, action) => {
     switch(action.type) {
         
-        case 'selectItem':
-            
+        case 'selectItem':            
             let total = action.payload.productPrice;
             let accumulatedTotal = state.total+total
             return {...state, total:accumulatedTotal, selectedItems: state.selectedItems.concat(action.payload)}
         
+        case 'logOut':
+            return {...state, userDetails:null, isSuper:false, isLoggedIn:false}
+
+        case 'loginUser':          
+          return {
+            ...state, 
+            userDetails: action.payload.userDetails, 
+            isSuper:action.payload.superStatus,
+            isLoggedIn:true
+          }
+
+        case 'addToDatasheetArray':
+          return {...state, datasheetArray: state.datasheetArray.concat(action.payload)}
+
+        
         case 'incrementQty':          
             return {...state, selectedItems: action.payload.myArray, total:action.payload.total}
+        
         case 'decrementQty':       
             return {...state, selectedItems: action.payload.myArray2, total:action.payload.total}
+        
         default:
             throw new Error();
         };

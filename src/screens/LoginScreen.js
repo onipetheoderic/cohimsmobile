@@ -3,7 +3,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {View, ToastAndroid, ActivityIndicator, Alert, Text, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import { CounterContext } from "../../store";
 import * as Animatable from 'react-native-animatable';
 import { doLogin, } from '../api/apiService'
 
@@ -17,36 +17,16 @@ const LoginScreen = (props) => {
     const [password, setPassword] = useState("");
     const [isLoading, setLoading] = useState(false)
     const { width, height } = Dimensions.get('window');
+    const globalState = useContext(CounterContext);    
   
 
   
 useEffect(() => {   
-    
-    let session = async () => await AsyncStorage.getItem('@SessionObj')  
-  session().then((val) => {
-      console.log("the session", val)
-    if (val) {
-        setLoading(true)
-        
-        let data = JSON.parse(val)
-        console.log(data)
-        if(data.section!="all_sections"){
-            setLoading(false)
-            props.navigation.navigate("HighwayMenu")
-        }
-        else {
-            setLoading(false)
-            props.navigation.navigate("Dashboard")
-        }
-  
-    }
-    else{
-        setLoading(false)
-    }
-  })
+console.log("the login Screen")
 }, []);
 
-loginPost = () =>{   
+const loginPost = () =>{   
+    const {state, dispatch } = globalState;
     setLoading(true)
     console.log("login details",email, password)
     if (email.length < 1 || password.length < 1) {
@@ -59,15 +39,23 @@ loginPost = () =>{
         formData.append('password', password);
         doLogin(formData).then((data) => {
          
-            if (data.success==true) {               
+            if (data.success==true) {   
+                const isSuper = data.section == "all_sections" ?true:false;
                 let store = async () => await AsyncStorage.setItem('@SessionObj', JSON.stringify(data))
+               
                     store().then(() => {
                         showToastWithGravity(data.message)
+                        let payload = {
+                            userDetails:data,
+                            isSuper:isSuper
+                          }
                         if(data.section!="all_sections"){
+                            dispatch({ type: 'loginUser', isSuper:true, payload:payload})
                             setLoading(false)
                             props.navigation.navigate("HighwayMenu")
                         }
                         else {
+                            dispatch({ type: 'loginUser', isSuper:false, payload:payload})
                             setLoading(false)
                             props.navigation.navigate("Dashboard")
                         }
@@ -83,7 +71,7 @@ loginPost = () =>{
     }
 }
 
-showToastWithGravity = (msg) => {
+const showToastWithGravity = (msg) => {
     ToastAndroid.showWithGravity(
       msg,
       ToastAndroid.SHORT,

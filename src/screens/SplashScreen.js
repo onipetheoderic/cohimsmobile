@@ -1,50 +1,79 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
 
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
-
   View,
   Text,
   Dimensions,
-  
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as Animatable from 'react-native-animatable';
+import AsyncStorage from '@react-native-community/async-storage';
+import { CounterContext } from "../../store";
 
 
 const SplashScreen = (props) => {
-    
-    const { width, height } = Dimensions.get('window');
-    setTimeout(() => {
-        props.navigation.navigate('HomeScreen'); //this.props.navigation.navigate('Login')
-    }, 4300); 
+  const [isLoading, setLoading] = useState(false)
+  const globalState = useContext(CounterContext);    
+  const { width, height } = Dimensions.get('window');
+  const [currentRoute, setCurrentRoute] = useState("");
+
+
+  useEffect(() => {    
+    let session = async () => await AsyncStorage.getItem('@SessionObj')  
+  session().then((val) => {
+      console.log("the session", val)
+      if (val) {
+          // setLoading(true)
+          
+          let data = JSON.parse(val)
+          console.log("splash",data)
+          const {state, dispatch } = globalState;
+          const isSuper = data.section == "all_sections" ?true:false
+          let payload = {
+            userDetails:data,
+            isSuper:isSuper
+          }
+          
+          if(isSuper==true){
+            setCurrentRoute('Dashboard')
+            dispatch({ type: 'loginUser', isSuper:true, payload:payload })
+            props.navigation.navigate('Dashboard');
+          }
+          else {
+            setCurrentRoute('HighwayMenu')
+            dispatch({ type: 'loginUser', isSuper:false, payload:payload })
+            props.navigation.navigate('HighwayMenu');
+          }
+      }
+      else{
+        setCurrentRoute('LoginScreen')
+        props.navigation.navigate('LoginScreen');
+      }
+  })
+}, []);
+
+
+  setTimeout(() => {
+      props.navigation.navigate(currentRoute); //this.props.navigation.navigate('Login')
+  }, 4300);
+
   return (
     <>
-        <View style={{flex:1, justifyContent:'center', backgroundColor:'#f98845'}} duration={3000} animation="zoomInUp">
+        <View style={{flex:1, justifyContent:'center', backgroundColor:'#0FC816'}} duration={3000} animation="zoomInUp">
         
-        <Animatable.Text duration={2500} animation="zoomInUp" style={{textAlign:'center', fontSize:20}}>
-        Welcome to FoodApp
+        <Animatable.Text duration={2500} animation="zoomInUp" style={{textAlign:'center', fontSize:25}}>
+        Welcome to Cohims
         </Animatable.Text>
-            {/* <Text style={{textAlign:'center', fontSize:20}}>Welcome to FoodApp</Text> */}
-            <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Text style={{textAlign:'center',fontSize:10, fontFamily:'Candara'}}>Created with </Text>
-            <FontAwesome name="heart" size={17}/>
+        <View style={{flexDirection:'row', justifyContent:'center'}}>
             <Animatable.Text animation="pulse" easing="ease-out" iterationCount="infinite" style={{textAlign:'center', marginLeft:4,fontSize:10, fontFamily:'Candara', fontWeight:'bold'}}>
-               Theoderic Onipe
+               Contract and Highway Mgt System
             </Animatable.Text>
            
             </View>
             <Animatable.Text delay={2000} duration={2000} animation="bounceInUp" style={{textAlign:'center',fontSize:10, fontFamily:'Candara'}}>
-            Email: onipetheoderic@gmail.com
-            </Animatable.Text>
-            
-            </View>
+                Ministry of Works Nigeria
+            </Animatable.Text>            
+        </View>
     </>
   );
 };

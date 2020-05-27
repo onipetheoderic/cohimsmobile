@@ -11,6 +11,10 @@ import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'
 import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 import {Foods} from '../api/foods';
 import {viewAllContracts, doSearchContract} from '../api/apiService';
+import Header from '../components/header';
+import { CounterContext } from "../../store";
+
+
 const data = [
   { state: "o", earnings: 0 },
   { state: "theo", earnings: 13000 },
@@ -58,9 +62,7 @@ const DashboardScreen = (props) => {
   const [searchValue, setSearchValue] = useState("");
   const [contracts, setContracts] = useState([])
     const { width, height } = Dimensions.get('window');
-    setTimeout(() => {
-        props.navigation.navigate('HomeScreen'); //this.props.navigation.navigate('Login')
-    }, 4300); 
+   
 
     const handlePress = () => {
         console.log("all")
@@ -120,12 +122,13 @@ const setQuery = (val) => {
  
 }
 
-
+// 
 console.log("list of works data", works)
   return (
 
     <ScrollView style={{backgroundColor:'white'}}>
       <StatusBar translucent={true} backgroundColor="transparent"/>
+      <Header title="Contract Administrative Portal" navigation={props.navigation}/>
       <View style={{marginTop:40, justifyContent:'center'}}>
       <Text style={{fontFamily:'Candara',textAlign:'center', fontSize:25}}>Ongoing Projects</Text>
       </View>

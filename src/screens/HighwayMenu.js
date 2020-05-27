@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
 
+import React, {useContext, useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -9,12 +9,13 @@ import {
   Dimensions,
   PixelRatio,
 } from 'react-native';
+import { CounterContext } from "../../store";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import {datasheetkey} from '../api/constants';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import PlayGround from '../components/playGround'
-import HighwayCard from '../components/highwayCard';
+import HighwayCard from '../components/highwayNav';
 import AsyncStorage from '@react-native-community/async-storage'
 import {allAssignedContracts} from '../api/apiService';
 import {Colors} from '../components/colors'
@@ -29,33 +30,33 @@ const HighwayMenu = (props) => {
     const [housing, setHousing] = useState([])
     const [national, setNational] = useState([]);
     const [savedDatasheet, setSavedDatasheet] = useState([]);
+    const globalState = useContext(CounterContext);    
     
    
     useEffect(() => {
-
-      let session = async () => await AsyncStorage.getItem('@SessionObj')    
-      session().then((val) => {
-        if (val) {
-          let sess = JSON.parse(val)
-          setToken(sess.user_token)
-          let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
-          dataSheetArray().then((val) => {
-            if (val) {
-              let Datasheets = JSON.parse(val)
-              console.log("DDDDD",Datasheets)
-              setSavedDatasheet(Datasheets)
-            
-            }
-          })
-         
-          allAssignedContracts(sess.user_token).then((data) => {
-           setRoad(data.road);
-           setBridge(data.bridge);
-           setHousing(data.housing);
-           setNational(data.national)
+      const {state, dispatch } = globalState;
+      console.log("this is the state", state)
+      let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
+        dataSheetArray().then((val) => {
+          console.log("the val", val)
+          if (val) {
+            let Datasheets = JSON.parse(val)
+            console.log("DDDDD",Datasheets)
+            dispatch({ type: 'addToDatasheetArray',payload:Datasheets})
+            setSavedDatasheet(Datasheets)          
+          }
+        })
+        if(state.isLoggedIn){
+          allAssignedContracts(state.userDetails.user_token).then((data) => {
+            setRoad(data.road);
+            setBridge(data.bridge);
+            setHousing(data.housing);
+            setNational(data.national)
           })
         }
-      })          
+      
+        
+            
     }, []);
 
 const roadExist = road.length==0?false:true;
@@ -69,9 +70,10 @@ const nationalExist = national.length==0?false:true;
 <PlayGround home={true} navigation={props.navigation} title="Highway Inspection Portal" height={height} width={width} navigate={props.navigation.navigate}>
         
     <View style={{backgroundColor:'white', flexDirection:'row',marginTop:20,marginBottom:10, justifyContent:'space-evenly', flexWrap:'wrap'}}>
-      <HighwayCard iconName="road" title="Completed Road Project" link="" />
-      <HighwayCard iconName="water" title="Completed Bridge Project" link="" />
-      <HighwayCard iconName="file" title="Messages" link="" />
+      <HighwayCard iconName="road" title="Saved Inspection Datasheets" navigation={props.navigation} link="AllSavedDatasheets" />
+      <HighwayCard iconName="envelope" title="View/Send Messages" navigation={props.navigation} link="Messages" />
+      <HighwayCard iconName="water" title="Completed Road/Bridge" link="" />
+      {/* <HighwayCard iconName="file" title="Messages" link="" /> */}
     </View>
     <View>
     {housingExist&&

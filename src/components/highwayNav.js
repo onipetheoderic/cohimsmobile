@@ -3,15 +3,13 @@ import {StyleSheet, ToastAndroid, TouchableOpacity, ActivityIndicator, TextInput
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Fontisto from 'react-native-vector-icons/Fontisto'
 
-export default function HighwayCard(props) {
+export default function HighwayNav(props) {
   
   return (
    
     <View style={styles.cardParent}>
     <View>
-    <TouchableOpacity onPress={()=>props.navigation.navigate('Project', {
-            type:props.link
-        })}>
+        <TouchableOpacity onPress={()=>props.navigation.navigate(props.link)}>
             <View style={{justifyContent:'center'}}>
                 <FontAwesome5 name={props.iconName} size={50} color="#cccccc" style={{marginBottom:15, marginTop:15,textAlign:'center'}} />
             </View>

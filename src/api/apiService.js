@@ -37,6 +37,40 @@ export async function getSingleContract(id, type) {
         console.warn(e.message)
     }
 }
+// // view_all_messages
+export async function viewAllMessages(userToken) {
+    try {
+        let feeds = await fetch(`${baseUrl}view_all_messages`, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+export async function viewSingleMessage(id,userToken) {
+    try {
+        let feeds = await fetch(`${baseUrl}view_single_msg/${id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
 
 
 export async function viewAllContracts() {

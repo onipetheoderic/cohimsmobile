@@ -1,7 +1,7 @@
 import {createAppContainer} from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-// import SplashScreen from './src/screens/SplashScreen';
+import SplashScreen from './src/screens/SplashScreen';
 
 import SingleContractPage from './src/screens/SingleContractPage';
 import LoginScreen from './src/screens/LoginScreen';
@@ -12,10 +12,12 @@ import UploadMenu from './src/screens/UploadMenu';
 import Project from './src/screens/Project';
 import SelectDatasheet from './src/screens/SelectDatasheet';
 import SelectedLocalDatasheet from './src/screens/SelectedLocalDatasheet';
-
+import AllSavedDatasheets from './src/screens/AllSavedDatasheets';
+import Messages from './src/screens/Messages';
+import SingleMessage from './src/screens/SingleMessage';
 const AppNavigator = createStackNavigator(
   {
-    // SplashScreen:SplashScreen,   
+    SplashScreen:SplashScreen,   
     LoginScreen:LoginScreen,
     UploadMenu:UploadMenu,
     Dashboard:Dashboard,
@@ -24,7 +26,11 @@ const AppNavigator = createStackNavigator(
     DatasheetScreen:DatasheetScreen,
     Project:Project,
     SelectDatasheet:SelectDatasheet,
-    SelectedLocalDatasheet:SelectedLocalDatasheet
+    SelectedLocalDatasheet:SelectedLocalDatasheet,
+    AllSavedDatasheets:AllSavedDatasheets,
+    Messages:Messages,
+    SingleMessage:SingleMessage
+
   },{
     headerMode: 'none'
   }
