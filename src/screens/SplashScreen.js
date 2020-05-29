@@ -18,8 +18,27 @@ const SplashScreen = (props) => {
   const [currentRoute, setCurrentRoute] = useState("");
 
 
-  useEffect(() => {    
+  useEffect(() => {
+    const {state, dispatch } = globalState;
+    let device_token = async () => await AsyncStorage.getItem('device_token')
+    device_token().then((raw_token) =>{
+      console.log("RAWWWWWWW",raw_token)
+      if(raw_token!=null){
+        let data = JSON.parse(raw_token)
+        
+        console.log("the device token", data)
+        //SaveDeviseToken
+        /* 
+AAAADX25ItA:APA91bFC8TBFRz0rHMZg95AiM3F3BnFCEYOOv_1yE3Vi1p7fepA9Owzt4mTaJQTTeH8dw_4_NowAAt8XoJCbdb4KGciyLNNe3RqQibzlavOshAPuFuFTtLzm9bwlwrmeVaO6PcBRlcCz
+        */
+        let payload = {
+          deviseToken:data
+        }
+        dispatch({ type: 'SaveDeviseToken', payload:payload })
+      }
+   
     let session = async () => await AsyncStorage.getItem('@SessionObj')  
+
   session().then((val) => {
       console.log("the session", val)
       if (val) {
@@ -27,7 +46,7 @@ const SplashScreen = (props) => {
           
           let data = JSON.parse(val)
           console.log("splash",data)
-          const {state, dispatch } = globalState;
+
           const isSuper = data.section == "all_sections" ?true:false
           let payload = {
             userDetails:data,
@@ -50,6 +69,7 @@ const SplashScreen = (props) => {
         props.navigation.navigate('LoginScreen');
       }
   })
+})
 }, []);
 
 

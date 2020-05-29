@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "57943859920",
+    "firebase_url": "https://cohims.firebaseio.com",
+    "project_id": "cohims",
+    "storage_bucket": "cohims.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:57943859920:android:11a7cdd9b3729f5d1fb4d5",
+        "android_client_info": {
+          "package_name": "com.cohims"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "57943859920-q21f52o5qs7vopkuo5ejfon7g8hv7oe3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnRUnygCn0m5egerWIji4uhEa18aDEk3M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "57943859920-q21f52o5qs7vopkuo5ejfon7g8hv7oe3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

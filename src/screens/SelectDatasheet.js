@@ -93,8 +93,12 @@ const HighwayMenu = (props) => {
     console.log("this isthe type", type)
     const isNew = all_datas.new===true?true:false
     function underscoreFormatter(str){
-        let new_str = str.toUpperCase();
-        return new_str.replace(/_/g, ' ');
+        if(str!=undefined){
+            let new_str = str.toUpperCase();
+            return new_str.replace(/_/g, ' ');
+        }
+        else return null
+     
     }
 const gotoLocalReport = (obj, title) => {
     console.log("selected obj",obj)

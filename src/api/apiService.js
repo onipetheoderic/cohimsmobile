@@ -37,7 +37,26 @@ export async function getSingleContract(id, type) {
         console.warn(e.message)
     }
 }
-// // view_all_messages
+//usersInSection
+
+export async function usersInSection(userToken) {
+    try {
+        let feeds = await fetch(`${baseUrl}users_in_section`, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
 export async function viewAllMessages(userToken) {
     try {
         let feeds = await fetch(`${baseUrl}view_all_messages`, {
@@ -48,6 +67,107 @@ export async function viewAllMessages(userToken) {
         });
         let result = await feeds.json();
 
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+export async function getAllSections(userToken) {
+    try {
+        let feeds = await fetch(`${baseUrl}get_all_sections`, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+//send_msg_to_sections, get_all_sections broadcast_msg_to_all_users
+
+export async function sendMsgToSection(formData, userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}send_msg_to_sections`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+export async function fireBaseNotification(rawData) {
+    try {
+        let feeds = await fetch(`https://fcm.googleapis.com/fcm/send`, {
+            method: 'post',
+            body: rawData,
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': "key=AAAADX25ItA:APA91bFC8TBFRz0rHMZg95AiM3F3BnFCEYOOv_1yE3Vi1p7fepA9Owzt4mTaJQTTeH8dw_4_NowAAt8XoJCbdb4KGciyLNNe3RqQibzlavOshAPuFuFTtLzm9bwlwrmeVaO6PcBRlcCz"
+            }
+        });
+        console.log("ressss",feeds)
+        let result = await feeds.json();
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function BroadcastMsgToAllUsers(formData, userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}broadcast_msg_to_all_users`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function submitMsg(formData, userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}send_mail`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
         feeds = null;
         return result;
     } catch (e) {
@@ -82,6 +202,27 @@ export async function viewAllContracts() {
         });
         let result = await feeds.json();
 
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function doSearchUsers(formData, userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}search_users`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
         feeds = null;
         return result;
     } catch (e) {

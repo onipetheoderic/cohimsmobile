@@ -15,6 +15,10 @@ import SelectedLocalDatasheet from './src/screens/SelectedLocalDatasheet';
 import AllSavedDatasheets from './src/screens/AllSavedDatasheets';
 import Messages from './src/screens/Messages';
 import SingleMessage from './src/screens/SingleMessage';
+import AdminMessage from './src/screens/AdminMessage';
+import SingleUserMessage from './src/screens/SingleUserMessage';
+import SendMsgToSection from './src/screens/SendMsgToSection'
+
 const AppNavigator = createStackNavigator(
   {
     SplashScreen:SplashScreen,   
@@ -29,7 +33,10 @@ const AppNavigator = createStackNavigator(
     SelectedLocalDatasheet:SelectedLocalDatasheet,
     AllSavedDatasheets:AllSavedDatasheets,
     Messages:Messages,
-    SingleMessage:SingleMessage
+    SingleMessage:SingleMessage,
+    AdminMessage:AdminMessage,
+    SingleUserMessage:SingleUserMessage,
+    SendMsgToSection:SendMsgToSection
 
   },{
     headerMode: 'none'

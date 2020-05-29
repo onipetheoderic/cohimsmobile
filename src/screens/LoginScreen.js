@@ -22,7 +22,8 @@ const LoginScreen = (props) => {
 
   
 useEffect(() => {   
-console.log("the login Screen")
+    const {state, dispatch } = globalState;
+console.log("the login Screen state", state)
 }, []);
 
 const loginPost = () =>{   
@@ -50,14 +51,25 @@ const loginPost = () =>{
                             isSuper:isSuper
                           }
                         if(data.section!="all_sections"){
-                            dispatch({ type: 'loginUser', isSuper:true, payload:payload})
-                            setLoading(false)
-                            props.navigation.navigate("HighwayMenu")
+                            let session = async () => await AsyncStorage.getItem('@SessionObj')
+                            session().then((val) => {
+                              if (val) {
+                                dispatch({ type: 'loginUser', isSuper:false, payload:payload})
+                                setLoading(false)
+                                props.navigation.navigate("HighwayMenu")
+                              }
+                            })
+                            
                         }
                         else {
-                            dispatch({ type: 'loginUser', isSuper:false, payload:payload})
+                            let session = async () => await AsyncStorage.getItem('@SessionObj')
+                            session().then((val) => {
+                              if (val) {
+                            dispatch({ type: 'loginUser', isSuper:true, payload:payload})
                             setLoading(false)
                             props.navigation.navigate("Dashboard")
+                              }
+                              })
                         }
                 }).catch((e) => {
                     console.warn(e.message)

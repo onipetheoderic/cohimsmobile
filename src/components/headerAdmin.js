@@ -2,13 +2,14 @@ import React, {useContext, useEffect, useState} from 'react';
 import {StyleSheet, ToastAndroid, TouchableOpacity, ActivityIndicator, TextInput, Button, Alert, SafeAreaView, ScrollView, Image, Text, View, RefreshControl, FlatList, StatusBar} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Fontisto from 'react-native-vector-icons/Fontisto'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import AsyncStorage from '@react-native-community/async-storage'
 import { NavigationActions, StackActions } from 'react-navigation'
 import { CounterContext } from "../../store";
 
 export default function Header(props) {
-
-  const globalState = useContext(CounterContext); 
+    const [isLoading, setLoading] = useState(false)
+    const globalState = useContext(CounterContext); 
   
 
 const clearAsyncStorage = () => {
@@ -33,10 +34,13 @@ const clearAsyncStorage = () => {
 }
 
 
-  return (
-   
+  return (   
         <View style={styles.titleBar}>
             <Text style={styles.text}>{props.title}</Text>
+            
+            <TouchableOpacity  onPress={() => props.navigation.navigate("AdminMessage")}>
+                <MaterialCommunityIcons name="message-plus" size={20} color="#52575d" />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => clearAsyncStorage()}>
                 <FontAwesome5 name="power-off" size={20} color="#52575d" />
             </TouchableOpacity>

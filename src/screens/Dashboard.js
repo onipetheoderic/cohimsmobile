@@ -1,9 +1,9 @@
 
-import React, {useState, useEffect} from 'react';
-import {View, Alert, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
+import React, {useState, useEffect, useContext} from 'react';
+import {View, Alert, ActivityIndicator, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as Animatable from 'react-native-animatable';
-
+import AsyncStorage from '@react-native-community/async-storage'
 import { TextInput } from 'react-native-gesture-handler';
 import {Colors} from '../components/colors'
 import SignInButton from '../components/signInButton';
@@ -11,7 +11,7 @@ import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'
 import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 import {Foods} from '../api/foods';
 import {viewAllContracts, doSearchContract} from '../api/apiService';
-import Header from '../components/header';
+import HeaderAdmin from '../components/headerAdmin';
 import { CounterContext } from "../../store";
 
 
@@ -61,7 +61,9 @@ const DashboardScreen = (props) => {
   const [works, setWorks] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [contracts, setContracts] = useState([])
+  const [isLoading, setLoading] = useState(true)
     const { width, height } = Dimensions.get('window');
+    const globalState = useContext(CounterContext); 
    
 
     const handlePress = () => {
@@ -82,22 +84,35 @@ const _default = (str) => {
     else return "No"
 }
 
+
 //viewAllContracts
 
 useEffect(() => {
+
+  const {state, dispatch } = globalState;
+console.log("the dashbord admin Screen state", state)
+if(state.isLoggedIn==true)
+{
   setContracts([])
-    viewAllContracts().then((data) => {
-      console.log("all Datas", data)
-      let housing_data = data.housing;
-      let works_data = data.works;
-      let national_data = data.national;
-      setHousing(housing_data);
-      setNational(national_data);
-      setWorks(works_data)
-      console.log("housoing", housing_data);
-      console.log("works", works_data);
-      console.log("national", national_data);
-    })
+  viewAllContracts().then((data) => {
+    
+    console.log("all Datas", data)
+    let housing_data = data.housing;
+    let works_data = data.works;
+    let national_data = data.national;
+    setHousing(housing_data);
+    setNational(national_data);
+    setWorks(works_data)
+    console.log("housoing", housing_data);
+    console.log("works", works_data);
+    console.log("national", national_data);
+    setLoading(false)
+  })
+}
+else {
+  props.navigation.navigate('LoginScreen')
+  setLoading(false)
+}
 }, []);
 
 const setQuery = (val) => {
@@ -123,12 +138,18 @@ const setQuery = (val) => {
 }
 
 // 
-console.log("list of works data", works)
+if (isLoading) {
+  return (
+    <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <ActivityIndicator size="large" color="#07411D" />
+    </View>
+  )
+}  
   return (
 
     <ScrollView style={{backgroundColor:'white'}}>
       <StatusBar translucent={true} backgroundColor="transparent"/>
-      <Header title="Contract Administrative Portal" navigation={props.navigation}/>
+      <HeaderAdmin title="Contract Administrative Portal" navigation={props.navigation}/>
       <View style={{marginTop:40, justifyContent:'center'}}>
       <Text style={{fontFamily:'Candara',textAlign:'center', fontSize:25}}>Ongoing Projects</Text>
       </View>

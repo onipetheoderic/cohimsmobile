@@ -1,5 +1,5 @@
 import React, { useState, createContext, useReducer } from "react";
-import AsyncStorage from '@react-native-community/async-storage';
+
 // Create Context Object
 const initialState = {
     count:0,
@@ -9,6 +9,7 @@ const initialState = {
     isLoggedIn:false,
     userDetails:null,
     isSuper:false,
+    deviseToken:null,
 };
 export const CounterContext = createContext(initialState);
 
@@ -33,6 +34,12 @@ export const CounterContextProvider = props => {
             userDetails: action.payload.userDetails, 
             isSuper:action.payload.superStatus,
             isLoggedIn:true
+          }
+
+        case 'SaveDeviseToken':         
+          return {
+            ...state, 
+            deviseToken: action.payload.deviseToken, 
           }
 
         case 'addToDatasheetArray':
