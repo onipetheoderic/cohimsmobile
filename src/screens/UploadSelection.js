@@ -27,7 +27,7 @@ import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
 
 
-const HighwayMenu = (props) => {    
+const UploadSelection = (props) => {    
     const { width, height } = Dimensions.get('window');
     const [token, setToken] = useState("");
     const [bridge, setBridge] = useState([]);
@@ -149,7 +149,7 @@ console.log(roadExist, bridgeExist, housingExist)
 
 <ScrollView style={{
     
-  marginTop:30
+  marginTop:50
     }}>
      
 
@@ -303,7 +303,7 @@ console.log(roadExist, bridgeExist, housingExist)
 
 
 
-export default HighwayMenu;
+export default UploadSelection;
 
 const styles = StyleSheet.create({
     cardParent: {

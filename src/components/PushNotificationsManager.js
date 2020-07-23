@@ -9,6 +9,7 @@ export default class PushNotificationManager extends React.Component {
     this.registerDevice()
     this.registerNotificationEvents()
   }
+  
 
   registerDevice = () => {
     Notifications.events().registerRemoteNotificationsRegistered(event => {

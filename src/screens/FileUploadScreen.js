@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import {
   SafeAreaView,
   StyleSheet,
+  TextInput,
   ScrollView,
   View,
   Text,
@@ -21,21 +22,27 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import PlayGround from '../components/playGround'
 import HighwayCard from '../components/highwayNav';
 import AsyncStorage from '@react-native-community/async-storage'
-
+import DocumentPicker from 'react-native-document-picker';
 import HighwayCircleCard from '../components/highwayCircleCard'
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
 import {allAssignedContracts, uploadInspectionDatasheet} from '../api/apiService';
-import {Colors} from '../components/colors'
+import {Colors} from '../components/colors';
+import AdvertiseButton from '../components/advertiseButton';
+// custom imports
+import Carousel from '../components/carousel'
+import CarouselPlayGround from '../components/carouselPlayground'
 import TimeAgo from 'react-native-timeago';
 import Swipeout from 'react-native-swipeout';
 
 
-const SelectDatasheet = (props) => {    
+const FileUploadScreen = (props) => {    
     const { width, height } = Dimensions.get('window');
     const [token, setToken] = useState("");
+    const [files, setFiles] = useState([])
     const [type, setType] = useState("")
     const [title, setTitle] = useState("")
+    const [content, changeContent] = useState("")
     const [user, setUser] = useState({});
     const [length, changeLength] = useState(0)
     const [id, setId] = useState("")
@@ -52,28 +59,9 @@ const SelectDatasheet = (props) => {
         setToken(token);      
         setTitle(title);
         setId(id);
-        let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
-        dataSheetArray().then((val) => {
-        if (val) {
-            let Datasheets = JSON.parse(val)
-            console.log("DDDDD",Datasheets)
-            let all_datasheets = [];
-            for(var i in Datasheets){
-                if(type===Datasheets[i].type){
-                    console.log("its searching", Datasheets[i].type)
-                    all_datasheets.push(Datasheets[i]);
-                }
-                
-            }
-            setSavedDatasheet(all_datasheets)          
-            }
-        })
-       
-                
+        
+        
     }, []);
-
-
-
     console.log("this isthe type", type)
     const isNew = all_datas.new===true?true:false
     function underscoreFormatter(str){
@@ -173,97 +161,89 @@ height={height} width={width} navigate={props.navigation.navigate}>
         )
       }
   )
+  
+  
+  const MultipleUploader = async () => {
+    
+    try {
+        const results = await DocumentPicker.pickMultiple({
+          type: [DocumentPicker.types.allFiles],
+        });
+        console.log("this iis ithe result",results)
+        // for (const res of results) {
+        //   console.log(
+        //     res.uri,
+        //     res.type, // mime type
+        //     res.name,
+        //     res.size
+        //   );
+        // }
+        setFiles(results);
+      } catch (err) {
+        if (DocumentPicker.isCancel(err)) {
+          // User cancelled the picker, exit any dialogs or menus and move on
+        } else {
+          throw err;
+        }
+      }
+
+}
 
 
   return (
     <View style={{flex:1}}> 
 
-    <View style={{backgroundColor:'green', flex: 1.5}}>
-        <ImageBackground
-            style={styles.image}
-            source={require('../../assets/images/sky3.jpg')}
-        >
-          <Text style={{
-            marginTop:70,
-            color:'white',
-            fontWeight:'bold',
-            fontSize:22,
-            marginLeft:40}}>File and Datasheet Upload Section</Text>
-            <Text style={{fontSize:12,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
-           Here you can select the Datasheet you want to upload for:
-            </Text>
-            <Text style={{fontSize:13,marginTop:20, marginLeft:40, marginRight:40, color:'white', fontFamily:'Candara'}}>
-            {title}
-            </Text>
-          
-        </ImageBackground>
-    </View> 
+    <View style={{backgroundColor:'green', flex: 1.6}}>
+        <CarouselPlayGround>
+           
+           <Carousel navigation={props.navigation} contractName={title} title="Here You can Quickly Upload Your File for a this Project" imageLink = {require('../../assets/images/camera1.jpg')} description="File Uploaded must be an Image/Video File"/>
+           <Carousel navigation={props.navigation} contractName={title} title="Update the Administrator with Realtime Images/Videos " imageLink = {require('../../assets/images/camera.jpg')} description="The Administrators will get this file upload in Realtime"/>
+           <Carousel navigation={props.navigation} contractName={title} title="Make your Report Rich with the Right Videos" imageLink = {require('../../assets/images/camera5.jpg')} description="Upload is Very easy just click the Rectangular Container and Start uploading in Realtime"/>
+           <Carousel navigation={props.navigation} contractName={title} title="Here You can Quickly Upload Your File for a this Project" imageLink = {require('../../assets/images/camera4.jpg')} description="File Uploaded must be an Image/Video File"/>
+           <Carousel navigation={props.navigation} contractName={title} title="Lets make Nigeria Great Again" imageLink = {require('../../assets/images/camera6.jpg')} description="Remember, Every Image/Video Uploaded helps with Decision making of the Ministry"/>
+        
+        </CarouselPlayGround>
+       
+    </View>
+
+
     <View style={{flex:2,backgroundColor:'white',
         borderTopRightRadius:40, 
         marginTop:-30,
         borderTopLeftRadius:40,}}>
     
         <ScrollView style={{marginTop:30}}>    
-            <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+            <View style={{justifyContent:'center'}}>
+                
+
                 <View style={[styles.eachCard]}>
+                    <TouchableOpacity onPress={()=>MultipleUploader()}>
                 <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
-    name="file-upload" size={41} color="green"/>
-  <Text style={styles.state}>Upload Datasheet</Text>  
+    name="camera" size={51} color="green"/>
+  <Text style={styles.state}>Upload Photos/Videos</Text>  
+  </TouchableOpacity>
                 </View>
-               
-                    <View style={[styles.eachCard]}>
-                    <TouchableOpacity onPress={() => props.navigation.navigate('FileUploadScreen', {
-                    id: id,
-                    type: type,
-                    token:token,
-                    title: title,
-              })}>
-                        <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
-                            name="camera" size={41} color="green"/>
-                        <Text style={styles.state}>Upload Photos/Videos</Text>  
-                        </TouchableOpacity>
-                    </View>
-             
-
-
             </View>
 
             <View style={{marginBottom:20, marginTop:20}}>
-            <Text style={[styles.title,{marginBottom:20}]}>Recent Datasheet Saved Within this Device</Text> 
+            <Text style={[styles.title,{marginBottom:20}]}>Comment/Description/Remark</Text> 
+            
+            <View style={[styles.eachCard]}>
+                <TextInput 
+                textAlignVertical={'top'}
+                value={content}
+                placeholder="Content" 
+                multiline={true}
+                numberOfLines={10}
+                style={{marginLeft:20,fontFamily:'Pacifico-Regular',}}
+                onChangeText={(text) => changeContent(text)}
+                />
+            </View>
+
+            <AdvertiseButton title="Upload Videos/Images" handleSubmit={()=>submitMessage()}/>
         
         
-        
-        <Swipeout left={[leftActionOne(1), leftActionTwo(1)]} 
-                right={[rightActionOne(1), leftActionTwo(1)]}  backgroundColor="#fff">
-            <TouchableOpacity style={styles.listContainer}>
-            <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>Test Store</Text>
-                <Text style={styles.listSubTitle}>Test Item</Text>
-            </View>
-            </TouchableOpacity>
-        </Swipeout>
-          
-
-        <Swipeout left={[leftActionOne(3), leftActionTwo(3)]} 
-                    right={[rightActionOne(3), leftActionTwo(3)]}  backgroundColor="#fff">
-            <TouchableOpacity style={styles.listContainer}>
-            <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>Test Store</Text>
-                <Text style={styles.listSubTitle}>Test Item</Text>
-            </View>
-            </TouchableOpacity>
-        </Swipeout>
-
-
-        <Swipeout left={[leftActionOne(3), leftActionTwo(3)]} 
-                    right={[rightActionOne(3), leftActionTwo(3)]}  backgroundColor="#fff">
-            <TouchableOpacity style={styles.listContainer}>
-            <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>Test Store</Text>
-                <Text style={styles.listSubTitle}>Test Item</Text>
-            </View>
-            </TouchableOpacity>
-        </Swipeout>
+      
 
 
 
@@ -281,7 +261,7 @@ height={height} width={width} navigate={props.navigation.navigate}>
     
     
     
-    export default React.memo(SelectDatasheet);
+    export default FileUploadScreen;
     
     const styles = StyleSheet.create({
         swipeoutSide: {
@@ -360,10 +340,11 @@ height={height} width={width} navigate={props.navigation.navigate}>
         },
         eachCard: {
           margin:10,
+          alignSelf:'center',
           backgroundColor:'white', 
-          width:'40%', 
+          width:'90%', 
           borderRadius:10,
-          height:150,
+          height:250,
           justifyContent:'center',
           shadowColor: "#000",
     shadowOffset: {

@@ -27,7 +27,7 @@ import MessageGround from '../components/messageGround';
 import AdvertiseButton from '../components/advertiseButton';
 import MessageCard from '../components/messageCard';
 import AsyncStorage from '@react-native-community/async-storage'
-import {getAllSections, BroadcastMsgToAllUsers, viewAllMessages} from '../api/apiService';
+import {getAllSections, BroadcastMsgToAllUsers, sendMsgToTopic, viewAllMessages} from '../api/apiService';
 import {Colors} from '../components/colors'
 import TimeAgo from 'react-native-timeago';
 import * as Animatable from 'react-native-animatable';
@@ -108,7 +108,7 @@ const handleInfiniteScroll = () => {
 
 const submitMessage = () =>{
     const {state, dispatch } = globalState;
-    console.log(subject.subject, content.content, selectedUser)
+    
     setLoading(true)
     if(subject.length<=10){
         showToastWithGravity("Subject must be atleast 10 characters")
@@ -129,6 +129,28 @@ const submitMessage = () =>{
                 showToastWithGravity(data.message)
                 changeShowMsg(false)
                 setLoading(false)
+                /*
+                
+                let formData = new FormData();
+                formData.append('type', "warning");
+                formData.append('content', content);
+                formData.append('topic', "cohims_broadcast")
+
+    
+                  sendMsgToTopic(formData).then((data)=>{
+                    console.log("msg frm firebase",data)
+                  })
+                */ 
+                let rawData = 
+                  {
+                    type: "warning",
+                    content: content,
+                    topic: "cohims_broadcast"
+                    
+                  }
+                  sendMsgToTopic(JSON.stringify(rawData)).then((data)=>{
+                    console.log("frm firebase",data)
+                  })
             }
             else {
                 showToastWithGravity("Server Error")

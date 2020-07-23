@@ -2,11 +2,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {View, ToastAndroid, ActivityIndicator, Alert, Text, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 import AsyncStorage from '@react-native-community/async-storage';
 import { CounterContext } from "../../store";
 import * as Animatable from 'react-native-animatable';
 import { doLogin, } from '../api/apiService'
-
+import messaging from '@react-native-firebase/messaging';
 import { TextInput } from 'react-native-gesture-handler';
 import {Colors} from '../components/colors'
 import SignInButton from '../components/signInButton'
@@ -23,8 +24,36 @@ const LoginScreen = (props) => {
   
 useEffect(() => {   
     const {state, dispatch } = globalState;
-console.log("the login Screen state", state)
+    console.log("the login Screen state", state)
+    AsyncStorage.getItem("@SessionObj")
+    .then((result)=>{
+        let parsifiedResult = JSON.parse(result);
+        if(parsifiedResult!=null){
+            let userDetails = parsifiedResult.userDetails;
+            let { section } = userDetails;
+            if(section!="all_sections"){
+                props.navigation.navigate("HighwayMenu")
+            }
+            else {
+                props.navigation.navigate("Dashboard")
+            }
+        }
+        else {
+            return ;
+        }
+    })
+
 }, []);
+
+
+const departmentSubscriber = (section) =>{
+    messaging()
+    .subscribeToTopic(section)
+    .then(() => console.log('Subscribed to sectional topic'));
+
+}
+
+
 
 const loginPost = () =>{   
     const {state, dispatch } = globalState;
@@ -33,47 +62,46 @@ const loginPost = () =>{
     if (email.length < 1 || password.length < 1) {
         // alert('Both email/password are required')
         showToastWithGravity("email and Password is required")
+        setLoading(false)
     } 
     else {
         let formData = new FormData();
         formData.append('email', email);
         formData.append('password', password);
+        formData.append('devise_token', state.deviseToken)
         doLogin(formData).then((data) => {
          
             if (data.success==true) {   
+                setLoading(false)
                 const isSuper = data.section == "all_sections" ?true:false;
-                let store = async () => await AsyncStorage.setItem('@SessionObj', JSON.stringify(data))
-               
-                    store().then(() => {
-                        showToastWithGravity(data.message)
-                        let payload = {
-                            userDetails:data,
-                            isSuper:isSuper
-                          }
-                        if(data.section!="all_sections"){
-                            let session = async () => await AsyncStorage.getItem('@SessionObj')
-                            session().then((val) => {
-                              if (val) {
-                                dispatch({ type: 'loginUser', isSuper:false, payload:payload})
-                                setLoading(false)
-                                props.navigation.navigate("HighwayMenu")
-                              }
-                            })
-                            
-                        }
-                        else {
-                            let session = async () => await AsyncStorage.getItem('@SessionObj')
-                            session().then((val) => {
-                              if (val) {
-                            dispatch({ type: 'loginUser', isSuper:true, payload:payload})
-                            setLoading(false)
-                            props.navigation.navigate("Dashboard")
-                              }
-                              })
-                        }
-                }).catch((e) => {
-                    console.warn(e.message)
-                })    
+                departmentSubscriber(data.section)
+                let payload = {
+                    userDetails:data,
+                    isSuper:isSuper
+                }
+
+                if(data.section!="all_sections"){
+                    setLoading(false)
+                    AsyncStorage.setItem("@SessionObj", JSON.stringify(payload)).then(
+                        () => AsyncStorage.getItem("@SessionObj")
+                              .then((result)=>{
+                                    console.log("TEST",result)
+                                    dispatch({ type: 'loginUser', isSuper:false, payload:payload})
+                                    props.navigation.navigate("HighwayMenu")
+                        })
+                    )                  
+                }
+                else { 
+                    setLoading(false)
+                    AsyncStorage.setItem("@SessionObj", JSON.stringify(payload)).then(
+                        () => AsyncStorage.getItem("@SessionObj")
+                              .then((result)=>{
+                                    console.log("TEST",result)                   
+                                    dispatch({ type: 'loginUser', isSuper:true, payload:payload})
+                                    props.navigation.navigate("Dashboard")
+                        })
+                    )    
+                }
                
             }else{
                 setLoading(false)
@@ -90,13 +118,13 @@ const showToastWithGravity = (msg) => {
       ToastAndroid.CENTER
     );
   };
-//   if (isLoading) {
-//     return (
-//       <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-//         <ActivityIndicator size="large" color="#07411D" />
-//       </View>
-//     )
-//   }
+  if (isLoading) {
+    return (
+      <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color="#07411D" />
+      </View>
+    )
+  }
   return (
     <>
     

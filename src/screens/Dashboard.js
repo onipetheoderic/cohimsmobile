@@ -91,6 +91,7 @@ useEffect(() => {
 
   const {state, dispatch } = globalState;
 console.log("the dashbord admin Screen state", state)
+setLoading(false)
 if(state.isLoggedIn==true)
 {
   setContracts([])
@@ -110,8 +111,9 @@ if(state.isLoggedIn==true)
   })
 }
 else {
-  props.navigation.navigate('LoginScreen')
   setLoading(false)
+  props.navigation.navigate('LoginScreen')
+  
 }
 }, []);
 

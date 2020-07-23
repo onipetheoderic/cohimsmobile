@@ -27,48 +27,48 @@ const SplashScreen = (props) => {
         let data = JSON.parse(raw_token)
         
         console.log("the device token", data)
-        //SaveDeviseToken
-        /* 
-AAAADX25ItA:APA91bFC8TBFRz0rHMZg95AiM3F3BnFCEYOOv_1yE3Vi1p7fepA9Owzt4mTaJQTTeH8dw_4_NowAAt8XoJCbdb4KGciyLNNe3RqQibzlavOshAPuFuFTtLzm9bwlwrmeVaO6PcBRlcCz
-        */
+       
         let payload = {
           deviseToken:data
         }
         dispatch({ type: 'SaveDeviseToken', payload:payload })
       }
+      props.navigation.navigate('LoginScreen');
+  
    
-    let session = async () => await AsyncStorage.getItem('@SessionObj')  
+ 
 
-  session().then((val) => {
-      console.log("the session", val)
-      if (val) {
-          // setLoading(true)
-          
-          let data = JSON.parse(val)
-          console.log("splash",data)
 
-          const isSuper = data.section == "all_sections" ?true:false
-          let payload = {
-            userDetails:data,
-            isSuper:isSuper
-          }
+  // session().then((val) => {
+  //     console.log("the session", val)
+  //     if (val) {
+  //         // setLoading(true)
           
-          if(isSuper==true){
-            setCurrentRoute('Dashboard')
-            dispatch({ type: 'loginUser', isSuper:true, payload:payload })
-            props.navigation.navigate('Dashboard');
-          }
-          else {
-            setCurrentRoute('HighwayMenu')
-            dispatch({ type: 'loginUser', isSuper:false, payload:payload })
-            props.navigation.navigate('HighwayMenu');
-          }
-      }
-      else{
-        setCurrentRoute('LoginScreen')
-        props.navigation.navigate('LoginScreen');
-      }
-  })
+  //         let data = JSON.parse(val)
+  //         console.log("splash",data)
+
+  //         const isSuper = data.section == "all_sections" ?true:false
+  //         let payload = {
+  //           userDetails:data,
+  //           isSuper:isSuper
+  //         }
+          
+  //         if(isSuper==true){
+  //           setCurrentRoute('Dashboard')
+  //           dispatch({ type: 'loginUser', isSuper:true, payload:payload })
+  //           props.navigation.navigate('Dashboard');
+  //         }
+  //         else {
+  //           setCurrentRoute('HighwayMenu')
+  //           dispatch({ type: 'loginUser', isSuper:false, payload:payload })
+  //           props.navigation.navigate('HighwayMenu');
+  //         }
+  //     }
+  //     else{
+  //       setCurrentRoute('LoginScreen')
+  //       props.navigation.navigate('LoginScreen');
+  //     }
+
 })
 }, []);
 

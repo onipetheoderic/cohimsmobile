@@ -28,7 +28,7 @@ import MessageGround from '../components/messageGround';
 import AdvertiseButton from '../components/advertiseButton';
 import MessageCard from '../components/messageCard';
 import AsyncStorage from '@react-native-community/async-storage'
-import {getAllSections,sendMsgToSection, submitMsg, viewAllMessages,usersInSection, viewSingleMessage} from '../api/apiService';
+import {getAllSections,sendMsgToSection, sendMsgToTopic, submitMsg, viewAllMessages,usersInSection, viewSingleMessage} from '../api/apiService';
 import {Colors} from '../components/colors'
 import TimeAgo from 'react-native-timeago';
 import * as Animatable from 'react-native-animatable';
@@ -72,6 +72,8 @@ const fetchFeeds = () => {
     })    
 }
 
+
+
 const fetchSections = () => {
     setLoading(true)
     const {state, dispatch } = globalState;
@@ -111,6 +113,16 @@ const submitMessage = () =>{
             console.log(data)
             if(data.success==true){
                 showToastWithGravity(data.message)
+                let rawData = 
+                {
+                  type: "warning",
+                  content: `${subject}...`,
+                  topic: singleSection
+                  
+                }
+                sendMsgToSection(JSON.stringify(rawData)).then((data)=>{
+                  console.log("frm firebase",data)
+                })
                 changeShowMsg(false)
                 setLoading(false)
             }

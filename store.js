@@ -1,5 +1,5 @@
-import React, { useState, createContext, useReducer } from "react";
-
+import React, { useState, createContext, useReducer, useEffect } from "react";
+import AsyncStorage from '@react-native-community/async-storage'
 // Create Context Object
 const initialState = {
     count:0,
@@ -11,6 +11,25 @@ const initialState = {
     isSuper:false,
     deviseToken:null,
 };
+
+const getUser = async () => {
+  // AsyncStorage.getItem("@SessionObj")
+  // .then((result)=>{
+  //   console.log("the result from context", result)
+  //     let parsifiedResult = JSON.parse(result);
+  //     let userDetails = parsifiedResult.userDetails;
+      
+  // })
+
+  try {
+    const user = await AsyncStorage.getItem('@SessionObj')
+    return user ? JSON.parse(user) : {};
+  } catch (e) {
+    console.log('Failed to fetch the data from storage');
+  }
+}
+
+
 export const CounterContext = createContext(initialState);
 
 
@@ -18,6 +37,7 @@ export const CounterContext = createContext(initialState);
 export const CounterContextProvider = props => {
 
   const [state, dispatch] = useReducer((state, action) => {
+
     switch(action.type) {
         
         case 'selectItem':            
@@ -28,13 +48,18 @@ export const CounterContextProvider = props => {
         case 'logOut':
             return {...state, userDetails:null, isSuper:false, isLoggedIn:false}
 
+        case 'updateUser':
+            return {...state, userDetails:action.payload}
+
         case 'loginUser':          
+        console.log("Context",props)
           return {
             ...state, 
             userDetails: action.payload.userDetails, 
             isSuper:action.payload.superStatus,
             isLoggedIn:true
           }
+          
 
         case 'SaveDeviseToken':         
           return {

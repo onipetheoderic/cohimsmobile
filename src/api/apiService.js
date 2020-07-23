@@ -38,7 +38,23 @@ export async function getSingleContract(id, type) {
     }
 }
 //usersInSection
+//get_user_details
+export async function getUserDetail(userToken) {
+    try {
+        let feeds = await fetch(`${baseUrl}get_user_details`, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
 
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
 export async function usersInSection(userToken) {
     try {
         let feeds = await fetch(`${baseUrl}users_in_section`, {
@@ -113,6 +129,60 @@ export async function sendMsgToSection(formData, userToken) {
         console.warn(e.message)
     }
 }
+
+/*
+const message = {
+  data: {
+    type: 'warning',
+    content: 'A new weather warning has been created!',
+  },
+  topic: 'weather',
+};
+*/ 
+
+// send_msg_to_single_user
+export async function sendMsgToSingleUser(rawData){
+    // send_msg_to_topic
+    console.log("the raw data")
+    try {
+        let feeds = await fetch(`${baseUrl}send_msg_to_single_user`, {
+            method: 'post',
+            body: rawData,
+            headers: {
+                'Content-type': 'application/json',
+            }
+        });
+        console.log("ressss",feeds)
+        let result = await feeds;
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+export async function sendMsgToTopic(rawData){
+    // send_msg_to_topic
+    console.log("the raw data")
+    try {
+        let feeds = await fetch(`${baseUrl}send_msg_to_topic`, {
+            method: 'post',
+            body: rawData,
+            headers: {
+                'Content-type': 'application/json',
+            }
+        });
+        console.log("ressss",feeds)
+        let result = await feeds;
+
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
 export async function fireBaseNotification(rawData) {
     try {
         let feeds = await fetch(`https://fcm.googleapis.com/fcm/send`, {
@@ -124,7 +194,7 @@ export async function fireBaseNotification(rawData) {
             }
         });
         console.log("ressss",feeds)
-        let result = await feeds.json();
+        let result = await feeds;
 
         feeds = null;
         return result;
@@ -260,7 +330,6 @@ export async function doLogin(formData) {
             }
         });
         let result = await feeds.json();
-        console.log("loggi", result)
         feeds = null;
         return result;
     } catch (e) {

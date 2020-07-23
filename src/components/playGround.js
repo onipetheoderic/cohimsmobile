@@ -1,5 +1,7 @@
 import React, {useContext} from 'react';
-import {StyleSheet, Dimensions,ToastAndroid, TouchableOpacity, ActivityIndicator, TextInput, Button, Alert, SafeAreaView, ScrollView, Image, Text, View, RefreshControl, FlatList, StatusBar} from 'react-native';
+import {StyleSheet, Dimensions,ToastAndroid, TouchableOpacity, 
+    ActivityIndicator, TextInput, Button, Alert, SafeAreaView, ScrollView, 
+    Image, Text, View, RefreshControl, FlatList, StatusBar} from 'react-native';
 import { CounterContext } from "../../store";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Fontisto from 'react-native-vector-icons/Fontisto'
@@ -14,8 +16,9 @@ export default function PlayGround(props) {
  
     
   return (
-    <SafeAreaView style={{backgroundColor:'white'}}>
-        <View style={{backgroundColor:'white', marginBottom:10}}>
+    <SafeAreaView style={{backgroundColor:props.bgColor}}>
+         <StatusBar translucent={true} backgroundColor="transparent"/>
+        <View style={{backgroundColor:props.bgColor, marginBottom:10}}>
             <Header title={props.title} navigation={props.navigation} home={props.home}/>
         </View>
   

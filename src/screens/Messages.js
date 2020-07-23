@@ -135,6 +135,7 @@ const submitMessage = () =>{
                 showToastWithGravity(data.msg)
                 changeShowMsg(false)
                 setLoading(false)
+                
             }
             else {
                 showToastWithGravity("Server Error")
