@@ -6,6 +6,8 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
+  ToastAndroid,
+  ActivityIndicator,
   View,
   Text,
   ImageBackground,
@@ -26,26 +28,34 @@ import DocumentPicker from 'react-native-document-picker';
 import HighwayCircleCard from '../components/highwayCircleCard'
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
-import {allAssignedContracts, uploadInspectionDatasheet} from '../api/apiService';
+import {allAssignedContracts, uploadInspectionDatasheet, DatasheetPost} from '../api/apiService';
 import {Colors} from '../components/colors';
 import AdvertiseButton from '../components/advertiseButton';
+import ValidationComponent from 'react-native-form-validator';
 // custom imports
 import Carousel from '../components/carousel'
 import CarouselPlayGround from '../components/carouselPlayground'
 import TimeAgo from 'react-native-timeago';
 import Swipeout from 'react-native-swipeout';
-
-
+import { fileIntelligience } from "../helpers/fileExtensionDetector";
+import RNFetchBlob from 'rn-fetch-blob'
+//checkVideoExtension checkImageExtension overallLegitFile
 const FileUploadScreen = (props) => {    
     const { width, height } = Dimensions.get('window');
     const [token, setToken] = useState("");
-    const [files, setFiles] = useState([])
+    const [files, setFiles] = useState([]);
+
+    const [needed, setNeeded] = useState([]);
+    const [imagesNeeded, setImagesNeeded] = useState([]);
+    const [videosNeeded, setVideosNeeded] = useState([])
+    const [isLoading, setLoading] = useState(false)
     const [type, setType] = useState("")
     const [title, setTitle] = useState("")
     const [content, changeContent] = useState("")
     const [user, setUser] = useState({});
     const [length, changeLength] = useState(0)
-    const [id, setId] = useState("")
+    const [id, setId] = useState("");
+    const [defualtMsg, changeDefaultMsg] = useState("Upload Photos/Videos")
     const [all_datas, changeAllDatas] = useState({})
     const [parameters, changeParameters] = useState({})
     const [savedDatasheet, setSavedDatasheet] = useState([]);
@@ -55,8 +65,17 @@ const FileUploadScreen = (props) => {
         let type = props.navigation.getParam('type', null)
         let id = props.navigation.getParam('id', null);
         let title = props.navigation.getParam('title', null)
-        let token = props.navigation.getParam('token',null);      
-        setToken(token);      
+        AsyncStorage.getItem("@SessionObj")
+        .then((result)=>{          
+            let parsifiedResult = JSON.parse(result);
+            if(parsifiedResult!=null){
+              let userDetails = parsifiedResult.userDetails;
+              let { user_token } = userDetails;
+              console.log("thy token",user_token)
+              setToken(user_token);  
+            }
+        })
+           
         setTitle(title);
         setId(id);
         
@@ -81,6 +100,7 @@ const gotoLocalReport = (obj, title) => {
         token: token
     })
 }
+
 /*
 <PlayGround home={true} navigation={props.navigation} title={title} 
 height={height} width={width} navigate={props.navigation.navigate}>
@@ -162,7 +182,7 @@ height={height} width={width} navigate={props.navigation.navigate}>
       }
   )
   
-  
+
   const MultipleUploader = async () => {
     
     try {
@@ -178,7 +198,20 @@ height={height} width={width} navigate={props.navigation.navigate}>
         //     res.size
         //   );
         // }
-        setFiles(results);
+        
+        let detailedFileObj = fileIntelligience(results);
+        console.log("the details", detailedFileObj)
+        let {images, videos, needed} = detailedFileObj;
+        setImagesNeeded(images);
+        setVideosNeeded(videos);
+        setNeeded(needed);
+        setFiles(needed);
+        changeDefaultMsg(
+            `${results.length} Files Selected, 
+            \n ${images.length} Images Selected,
+            \n ${videos.length} Videos Selected,
+            \n ${needed.length} Permitted Files`
+        )
       } catch (err) {
         if (DocumentPicker.isCancel(err)) {
           // User cancelled the picker, exit any dialogs or menus and move on
@@ -189,6 +222,52 @@ height={height} width={width} navigate={props.navigation.navigate}>
 
 }
 
+const showToastWithGravity = (msg) => {
+    ToastAndroid.showWithGravity(
+      msg,
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER
+    );
+  };
+
+const submitMessage = () => {
+  if(content.length>=10 && files.length>=1 ){
+    setLoading(true)
+        let payload = [
+            {name: "contract_id", data: id.toString()},
+            {name: "comment", data: content.toString()},
+
+        ];
+        for(var i in files){
+            let eachcontent = {name : 'documents', filename : files[i].name, type:files[i].type, data: RNFetchBlob.wrap(files[i].uri)}        
+            payload.push(eachcontent)
+        }
+        console.log(payload)
+        DatasheetPost(token, payload)
+        .then((data) => {
+            console.log("succeeesosos", data)
+            if(data.success==false){
+                setLoading(false)
+                showToastWithGravity(data.message)
+            }
+            else if(data.success==true) {
+                setLoading(false)
+                showToastWithGravity(data.message)
+                props.navigation.navigate('HighwayMenu')
+            }               
+        }
+        )
+    
+
+
+  }
+  else if(content.length<=9){
+      alert("Content must be more than 9 characters")
+  }
+  else if(files.length==0){
+      alert("No Permitted Video/Image has been selected")
+  }
+}
 
   return (
     <View style={{flex:1}}> 
@@ -220,7 +299,7 @@ height={height} width={width} navigate={props.navigation.navigate}>
                     <TouchableOpacity onPress={()=>MultipleUploader()}>
                 <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
     name="camera" size={51} color="green"/>
-  <Text style={styles.state}>Upload Photos/Videos</Text>  
+  <Text style={styles.state}>{defualtMsg}</Text>  
   </TouchableOpacity>
                 </View>
             </View>
@@ -239,15 +318,12 @@ height={height} width={width} navigate={props.navigation.navigate}>
                 onChangeText={(text) => changeContent(text)}
                 />
             </View>
-
+            {!isLoading &&
             <AdvertiseButton title="Upload Videos/Images" handleSubmit={()=>submitMessage()}/>
-        
-        
-      
-
-
-
-
+            }
+            {isLoading &&
+            <ActivityIndicator size="large" color="#07411D" />
+            }
             </View>
         </ScrollView>
      

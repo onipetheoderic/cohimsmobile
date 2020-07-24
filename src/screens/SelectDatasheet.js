@@ -49,6 +49,7 @@ const SelectDatasheet = (props) => {
         let id = props.navigation.getParam('id', null);
         let title = props.navigation.getParam('title', null)
         let token = props.navigation.getParam('token',null);      
+        console.log("the toekn",token)
         setToken(token);      
         setTitle(title);
         setId(id);

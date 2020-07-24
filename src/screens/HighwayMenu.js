@@ -65,6 +65,7 @@ const HighwayMenu = (props) => {
             if(parsifiedResult!=null){
               let userDetails = parsifiedResult.userDetails;
               let { user_token } = userDetails;
+              console.log(user_token)
               getUserDetail(user_token)
               .then((data) => {
               console.log("userfffffl", data)
