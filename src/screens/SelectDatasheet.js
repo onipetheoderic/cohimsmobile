@@ -2,10 +2,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
+  ToastAndroid,
   SafeAreaView,
   StyleSheet,
   ScrollView,
   View,
+  Alert,
   Text,
   ImageBackground,
   Dimensions,
@@ -25,10 +27,12 @@ import AsyncStorage from '@react-native-community/async-storage'
 import HighwayCircleCard from '../components/highwayCircleCard'
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
-import {allAssignedContracts, uploadInspectionDatasheet} from '../api/apiService';
+import underscoreFormatter from '../helpers/underscoreFormatter';
+import { allAssignedContracts, uploadInspectionDatasheet, datasheetRoadBridgePost } from '../api/apiService';
 import {Colors} from '../components/colors'
 import TimeAgo from 'react-native-timeago';
 import Swipeout from 'react-native-swipeout';
+
 
 
 const SelectDatasheet = (props) => {    
@@ -50,41 +54,32 @@ const SelectDatasheet = (props) => {
         let title = props.navigation.getParam('title', null)
         let token = props.navigation.getParam('token',null);      
         console.log("the toekn",token)
-        setToken(token);      
+        AsyncStorage.getItem("@SessionObj")
+        .then((result)=>{          
+            let parsifiedResult = JSON.parse(result);
+            if(parsifiedResult!=null){
+              let userDetails = parsifiedResult.userDetails;
+              let { user_token } = userDetails;
+              console.log("thy token",user_token)
+              setToken(user_token);  
+            }
+        })     
         setTitle(title);
         setId(id);
         let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
         dataSheetArray().then((val) => {
         if (val) {
             let Datasheets = JSON.parse(val)
-            console.log("DDDDD",Datasheets)
-            let all_datasheets = [];
-            for(var i in Datasheets){
-                if(type===Datasheets[i].type){
-                    console.log("its searching", Datasheets[i].type)
-                    all_datasheets.push(Datasheets[i]);
-                }
-                
-            }
-            setSavedDatasheet(all_datasheets)          
+            console.log("DDDDD",Datasheets)            
+            setSavedDatasheet(Datasheets)          
             }
         })
        
                 
     }, []);
 
-
-
-    console.log("this isthe type", type)
     const isNew = all_datas.new===true?true:false
-    function underscoreFormatter(str){
-        if(str!=undefined){
-            let new_str = str.toUpperCase();
-            return new_str.replace(/_/g, ' ');
-        }
-        else return null
-     
-    }
+   
 const gotoLocalReport = (obj, title) => {
     console.log("selected obj",obj)
     props.navigation.navigate('SelectedLocalDatasheet', {
@@ -94,10 +89,67 @@ const gotoLocalReport = (obj, title) => {
         token: token
     })
 }
-/*
-<PlayGround home={true} navigation={props.navigation} title={title} 
-height={height} width={width} navigate={props.navigation.navigate}>
-*/ 
+
+const getDatasheetById = (storageId) => {
+  let storageIndex = savedDatasheet.findIndex(x => x.id === storageId)
+  let selectedDatasheet = savedDatasheet[storageIndex];
+  let { components, date, latitude, longitude, type } = selectedDatasheet;
+  let componentData = components.road;
+
+  let selectedData = [];
+  for(var i=0; i<componentData.length; i++){
+    if(componentData[i].amount!="" && componentData[i].qty!="" && componentData[i].unit!=""){
+      selectedData.push(componentData[i])
+    }
+    
+  }
+  console.log("the selected data", selectedData)
+  //datasheetRoadBridgePost
+  let formData = new FormData();
+  formData.append('date', date);
+  formData.append('latitude', latitude);
+  formData.append('longitude', longitude);
+  formData.append('type', type);
+  formData.append('selected_data',JSON.stringify(selectedData));
+  formData.append('contract_id', id);
+
+  datasheetRoadBridgePost(formData, token).then((data) => {
+    if(data.success==false){
+      // showToastWithGravity(data.message)
+      // alert(data.message)
+      Alert.alert(
+        "Error During Upload",
+        data.message,
+        [
+         
+          {
+            text: "OK",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          
+        ],
+        { cancelable: false }
+      );
+  
+    }
+    else {
+      showToastWithGravity(data.message)
+      props.navigation.navigate('HighwayMenu')
+    }
+  })
+
+}
+
+
+const showToastWithGravity = (msg) => {
+  ToastAndroid.showWithGravity(
+    msg,
+    ToastAndroid.LONG,
+    ToastAndroid.CENTER
+  );
+};
+
 
   const rightActionOne = (id) => (
     {
@@ -105,13 +157,13 @@ height={height} width={width} navigate={props.navigation.navigate}>
         component: (
           <View style={styles.swipeoutSide}>
             <Ionicons
-              size={40}
-              onPress={() => alert("Edit"+id)}
+              size={30}
+              onPress={() => getDatasheetById(id)}
               color='#ffc107'
               name= {
                 Platform.OS === 'ios'
-                  ? `ios-create-outline`
-                  : 'md-create'
+                  ? `send`
+                  : 'send'
               }/>
             </View>
           )
@@ -123,57 +175,68 @@ height={height} width={width} navigate={props.navigation.navigate}>
         backgroundColor: '#fff',
         component: (
           <View style={styles.swipeoutSide}>
-            <Ionicons
-              size={40}
-              onPress={() => alert("Delete"+id)}
-              color='#dc3545'
+            <FontAwesome5
+              size={30}
+              onPress={() => props.navigation.navigate("DatasheetEdit", {id:id})}
+              color='#28a745'
               name= {
                 Platform.OS === 'ios'
-                  ? `ios-trash-outline`
-                  : 'md-trash'
+                ? `edit`
+                : 'edit'
               }
             />
           </View>
         )
       }
   )
+/*
 
-  const leftActionOne = (id) => (
-    {
-        backgroundColor: '#fff',
-        component: (
-          <View style={styles.swipeoutSide}>
-            <Ionicons
-              size={40}
-              onPress={() => alert("Share", +id)}
-              color='#007bff'
-              name= {
-                Platform.OS === 'ios'
-                  ? `ios-share-outline`
-                  : 'md-share-alt'
-            }/>
-          </View>
-        )
-      }
- )
-  const leftActionTwo = (id) => (
-     {
-        backgroundColor: '#fff',
-        component: (
-          <View style={styles.swipeoutSide}>
-            <Ionicons
-              size={40}
-              onPress={() => alert("Complete"+id)}
-              color='#28a745'
-              name= {
-                Platform.OS === 'ios'
-                  ? `ios-checkmark-circle-outline`
-                  : 'md-checkmark-circle-outline'
-            }/>
-          </View>
-        )
-      }
-  )
+ <Swipeout left={[leftActionOne(savedDatasheet.id), leftActionTwo(savedDatasheet.id)]} 
+                right={[rightActionOne(savedDatasheet.id), leftActionTwo(savedDatasheet.id)]}  backgroundColor="#fff">
+            <TouchableOpacity style={styles.listContainer}>
+            <View style={styles.listHeader}>
+                <Text style={styles.listTitle}>{savedDatasheet.title}</Text>
+                <Text style={styles.listSubTitle}>{underscoreFormatter(savedDatasheet.type)}(<TimeAgo time={savedDatasheet.date}/>)</Text>
+            </View>
+            </TouchableOpacity>
+        </Swipeout>
+*/ 
+//   const leftActionOne = (id) => (
+//     {
+//         backgroundColor: '#fff',
+//         component: (
+//           <View style={styles.swipeoutSide}>
+//             <Ionicons
+//               size={40}
+//               onPress={() => alert("Share", +id)}
+//               color='#007bff'
+//               name= {
+//                 Platform.OS === 'ios'
+//                   ? `ios-share-outline`
+//                   : 'md-share-alt'
+//             }/>
+//           </View>
+//         )
+//       }
+//  )
+  // const leftActionTwo = (id) => (
+  //    {
+  //       backgroundColor: '#fff',
+  //       component: (
+  //         <View style={styles.swipeoutSide}>
+  //           <Ionicons
+  //             size={40}
+  //             onPress={() => alert("Complete"+id)}
+  //             color='#28a745'
+  //             name= {
+  //               Platform.OS === 'ios'
+  //                 ? `ios-checkmark-circle-outline`
+  //                 : 'md-checkmark-circle-outline'
+  //           }/>
+  //         </View>
+  //       )
+  //     }
+  // )
 
 
   return (
@@ -206,11 +269,18 @@ height={height} width={width} navigate={props.navigation.navigate}>
     
         <ScrollView style={{marginTop:30}}>    
             <View style={{flexDirection:'row', justifyContent:'space-around'}}>
-                <View style={[styles.eachCard]}>
+                {/* <View style={[styles.eachCard]}>
+                <TouchableOpacity onPress={() => props.navigation.navigate('FileUploadScreen', {
+                    id: id,
+                    type: type,
+                    token:token,
+                    title: title,
+              })}>
                 <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
     name="file-upload" size={41} color="green"/>
-  <Text style={styles.state}>Upload Datasheet</Text>  
-                </View>
+  <Text style={styles.state}>Edit/Add Fields Datasheet</Text>
+              </TouchableOpacity>
+                </View> */}
                
                     <View style={[styles.eachCard]}>
                     <TouchableOpacity onPress={() => props.navigation.navigate('FileUploadScreen', {
@@ -233,39 +303,18 @@ height={height} width={width} navigate={props.navigation.navigate}>
             <Text style={[styles.title,{marginBottom:20}]}>Recent Datasheet Saved Within this Device</Text> 
         
         
-        
-        <Swipeout left={[leftActionOne(1), leftActionTwo(1)]} 
-                right={[rightActionOne(1), leftActionTwo(1)]}  backgroundColor="#fff">
+        {savedDatasheet.map((savedDatasheet, index) => (
+        <Swipeout right={[rightActionOne(savedDatasheet.id), rightActionTwo(savedDatasheet.id)]}  backgroundColor="#fff">
             <TouchableOpacity style={styles.listContainer}>
             <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>Test Store</Text>
-                <Text style={styles.listSubTitle}>Test Item</Text>
+                <Text style={styles.listTitle}>{savedDatasheet.title}</Text>
+                <Text style={styles.listSubTitle}>{underscoreFormatter(savedDatasheet.type)}(<TimeAgo time={savedDatasheet.date}/>)</Text>
             </View>
             </TouchableOpacity>
         </Swipeout>
-          
+        ))}
 
-        <Swipeout left={[leftActionOne(3), leftActionTwo(3)]} 
-                    right={[rightActionOne(3), leftActionTwo(3)]}  backgroundColor="#fff">
-            <TouchableOpacity style={styles.listContainer}>
-            <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>Test Store</Text>
-                <Text style={styles.listSubTitle}>Test Item</Text>
-            </View>
-            </TouchableOpacity>
-        </Swipeout>
-
-
-        <Swipeout left={[leftActionOne(3), leftActionTwo(3)]} 
-                    right={[rightActionOne(3), leftActionTwo(3)]}  backgroundColor="#fff">
-            <TouchableOpacity style={styles.listContainer}>
-            <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>Test Store</Text>
-                <Text style={styles.listSubTitle}>Test Item</Text>
-            </View>
-            </TouchableOpacity>
-        </Swipeout>
-
+       
 
 
 
@@ -317,7 +366,7 @@ height={height} width={width} navigate={props.navigation.navigate}>
             marginLeft: 20
           },
           listTitle: {
-            fontSize: 22,
+            fontSize: 16,
             color: '#1A4024',
             marginBottom: 2,
             fontFamily:'Candara'
@@ -362,7 +411,7 @@ height={height} width={width} navigate={props.navigation.navigate}>
         eachCard: {
           margin:10,
           backgroundColor:'white', 
-          width:'40%', 
+          width:'84%', 
           borderRadius:10,
           height:150,
           justifyContent:'center',

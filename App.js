@@ -18,9 +18,12 @@ import Messages from './src/screens/Messages';
 import SingleMessage from './src/screens/SingleMessage';
 import AdminMessage from './src/screens/AdminMessage';
 import SingleUserMessage from './src/screens/SingleUserMessage';
-import SendMsgToSection from './src/screens/SendMsgToSection'
-import FileUploadScreen from './src/screens/FileUploadScreen'
-
+import SendMsgToSection from './src/screens/SendMsgToSection';
+import FileUploadScreen from './src/screens/FileUploadScreen';
+import DatasheetTemplate from './src/screens/DatasheetTemplate';
+import BridgeDatasheet from './src/screens/BridgeDatasheet';
+import DatasheetEdit from './src/screens/DatasheetEdit';
+import HdmiVerification from './src/screens/HdmiVerification';
 
 
 const AppNavigator = createStackNavigator(
@@ -42,8 +45,11 @@ const AppNavigator = createStackNavigator(
     SingleUserMessage:SingleUserMessage,
     SendMsgToSection:SendMsgToSection,
     UploadSelection:UploadSelection,
-    FileUploadScreen:FileUploadScreen
-
+    FileUploadScreen:FileUploadScreen,
+    DatasheetTemplate:DatasheetTemplate,
+    BridgeDatasheet:BridgeDatasheet,
+    DatasheetEdit:DatasheetEdit,
+    HdmiVerification:HdmiVerification,
   },{
     headerMode: 'none'
   }

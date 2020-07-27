@@ -4,7 +4,6 @@
 import React, { useState, createContext, useContext } from "react";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
-// import PushNotificationManager from './src/components/PushNotificationsManager';
 import PushNotification from './src/components/PushNotification';
 import {AppRegistry} from 'react-native';
 import App from './App';

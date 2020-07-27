@@ -20,8 +20,11 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AdvertiseButton from '../components/advertiseButton';
 import {allAssignedContracts, uploadInspectionDatasheet} from '../api/apiService';
 import {Colors} from '../components/colors'
+import BeautyCard from '../components/beautyCard';
 import TimeAgo from 'react-native-timeago';
 import * as Animatable from 'react-native-animatable';
+import { MonthGetter, DayGetter } from '../helpers/dateFormatter';
+import underscoreFormatter from '../helpers/underscoreFormatter';
 
 
 const AllSavedDatasheets = (props) => {    
@@ -53,7 +56,8 @@ const showDatasheet = (id,index) => {
  console.log("the show", id)
  changeShowModal(true)
  let selectedDatasheet = savedDatasheet[parseInt(index)];
- changeParameters(selectedDatasheet.components.components)
+ console.log(selectedDatasheet)
+ changeParameters(selectedDatasheet.components)
 }
 
 const deleteDatasheet = (id) => {
@@ -88,11 +92,7 @@ const deleteDatasheet = (id) => {
       { cancelable: true }
     );
 
-    function underscoreFormatter(str){
-        let new_str = str.toUpperCase();
-        return new_str.replace(/_/g, ' ');
-    }
-
+  
     const showToastWithGravity = (msg) => {
         ToastAndroid.showWithGravity(
             msg,
@@ -100,7 +100,22 @@ const deleteDatasheet = (id) => {
             ToastAndroid.CENTER
         );
     };
-console.log("ssssss",parameters)
+    const handleTrash = (id)=>{
+        console.log("to be delete")
+        Alert.alert(
+            "Delete post",
+            "You edit or delete a post from here",
+            [ 
+              
+            { text: "Delete Datasheet", 
+                onPress: () => deleteDatasheet(id)             
+            } 
+            ],
+            { cancelable: true }
+          );
+      
+    }
+
   return (
     <>
       {showModal && parameters &&
@@ -118,29 +133,37 @@ console.log("ssssss",parameters)
       
 </Animatable.View>
     }
-<PlayGround home={true} navigation={props.navigation} title={title} height={height} width={width} navigate={props.navigation.navigate}>
-<Text style={{fontFamily:'Candara', textAlign:'center', fontSize:16, margin:10}}>You are Newly Assigned to This project</Text>
-<Text style={{fontFamily:'Candara', textAlign:'center', fontSize:16}}>Kindly select from your local inspection datasheet below</Text>
+<ScrollView>
+<Text style={{fontFamily:'Candara', marginTop:40, textAlign:'center',
+ fontSize:17, margin:10}}>List of Inspection Datasheets Saved By You ({savedDatasheet.length})</Text>
 <View style={{marginBottom:70}}>
 
 {savedDatasheet.map((savedDatasheet, index) => (
-    
-    <View style={styles.cardStyle} key={savedDatasheet.id}>
-        <View style={{marginLeft:20}}>
-        <Text style={{fontFamily:'Candara', fontSize:17, color:'white'}}>{savedDatasheet.title}</Text>
-        <Text style={{fontFamily:'Candara', fontSize:12, color:'white'}}><TimeAgo time={savedDatasheet.date}/></Text>
-        <Text style={{fontFamily:'Candara', fontSize:12, color:'white'}}>{underscoreFormatter(savedDatasheet.type)}</Text>
-        <TouchableOpacity onPress={()=>createTwoButtonAlert(savedDatasheet.id, index)}>
-            <Text style={{fontFamily: "Candara", fontSize:10}}>Datasheet setting</Text>
-        </TouchableOpacity>
-        </View>
-    </View>
+    <BeautyCard 
+    key={savedDatasheet.id}
+    title={savedDatasheet.title}
+    type={underscoreFormatter(savedDatasheet.type)}
+    time={<TimeAgo time={savedDatasheet.date}/>}
+    day={DayGetter(savedDatasheet.date)}
+    monthName={MonthGetter(savedDatasheet.date)}
+    handleTrash = {()=>handleTrash(savedDatasheet.id, index)}
+    />
+    // <View style={styles.cardStyle} key={savedDatasheet.id}>
+    //     <View style={{marginLeft:20}}>
+    //     <Text style={{fontFamily:'Candara', fontSize:17, color:'white'}}>{savedDatasheet.title}</Text>
+    //     <Text style={{fontFamily:'Candara', fontSize:12, color:'white'}}><TimeAgo time={savedDatasheet.date}/></Text>
+    //     <Text style={{fontFamily:'Candara', fontSize:12, color:'white'}}>{underscoreFormatter(savedDatasheet.type)}</Text>
+    //     <TouchableOpacity onPress={()=>createTwoButtonAlert(savedDatasheet.id, index)}>
+    //         <Text style={{fontFamily: "Candara", fontSize:10}}>Datasheet setting</Text>
+    //     </TouchableOpacity>
+    //     </View>
+    // </View>
     
 ))}
 
 </View>
 
-</PlayGround>
+</ScrollView>
     
       
   </>

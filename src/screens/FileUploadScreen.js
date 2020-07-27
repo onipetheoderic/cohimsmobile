@@ -83,14 +83,7 @@ const FileUploadScreen = (props) => {
     }, []);
     console.log("this isthe type", type)
     const isNew = all_datas.new===true?true:false
-    function underscoreFormatter(str){
-        if(str!=undefined){
-            let new_str = str.toUpperCase();
-            return new_str.replace(/_/g, ' ');
-        }
-        else return null
-     
-    }
+   
 const gotoLocalReport = (obj, title) => {
     console.log("selected obj",obj)
     props.navigation.navigate('SelectedLocalDatasheet', {
@@ -254,7 +247,7 @@ const submitMessage = () => {
                 setLoading(false)
                 showToastWithGravity(data.message)
                 props.navigation.navigate('HighwayMenu')
-            }               
+            }
         }
         )
     

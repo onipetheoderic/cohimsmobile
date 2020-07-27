@@ -107,6 +107,46 @@ export async function getAllSections(userToken) {
     }
 }
 
+//hdmi_verify_code_post
+export async function hdmiVerifyCodePost(formData, userToken) {    
+    try {
+        let feeds = await fetch(`${baseUrl}hdmi_verify_code_post`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function datasheetRoadBridgePost(formData, userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}datasheet_road_bridge_post`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
 
 //send_msg_to_sections, get_all_sections broadcast_msg_to_all_users
 
@@ -350,17 +390,6 @@ export async function uploadInspectionDatasheet(id, type) {
     }
 }
 
-export async function getPostsByCategory(baseUrl, categoryId, pageId) {
-    try {
-        let feeds = await fetch(`${baseUrl}api/category/${categoryId}?page=${pageId}`);
-        let result = await feeds.json();
-
-        feeds = null;
-        return result;
-    } catch (e) {
-        console.warn(e.message)
-    }
-}
 
 
 export async function fetchUserProfile(baseUrl, userToken) {
@@ -380,93 +409,6 @@ export async function fetchUserProfile(baseUrl, userToken) {
     }
 }
 
-export async function fetchUserReferrals(baseUrl, userToken) {
-    try {
-        let feeds = await fetch(`${baseUrl}api/referrals`, {
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${userToken}`
-            }
-        });
-        let result = await feeds.json();
-
-        feeds = null;
-        return result;
-    } catch (e) {
-        console.warn(e.message)
-    }
-}
-
-export async function fetchUserEarnings(baseUrl, userToken) {
-    try {
-        let feeds = await fetch(`${baseUrl}api/earnings`, {
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${userToken}`
-            }
-        });
-        let result = await feeds.json();
-
-        feeds = null;
-        return result;
-    } catch (e) {
-        console.warn(e.message)
-    }
-}
-
-export async function fetchUserPayouts(baseUrl, userToken) {
-    try {
-        let feeds = await fetch(`${baseUrl}api/payouts`, {
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${userToken}`
-            }
-        });
-        let result = await feeds.json();
-
-        feeds = null;
-        return result;
-    } catch (e) {
-        console.warn(e.message)
-    }
-}
-
-export async function doPostComment(baseUrl, formData, token) {
-    try {
-        let feeds = await fetch(`${baseUrl}api/writeComment`, {
-            method: 'post',
-            body: formData,
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        let result = await feeds.json();
-
-        feeds = null;
-        return result;
-    } catch (e) {
-        console.warn(e.message)
-    }
-}
-
-export async function doDeleteComment(baseUrl, id, token) {
-    try {
-        let feeds = await fetch(`${baseUrl}api/deleteComment/${id}`, {
-            method: 'delete',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        let result = await feeds.json();
-
-        feeds = null;
-        return result;
-    } catch (e) {
-        console.warn(e.message)
-    }
-}
 
 export async function fetchUserPosts(baseUrl, pageId, token) {
     try {

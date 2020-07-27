@@ -4,9 +4,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import {
   SafeAreaView,
   StyleSheet,
+  Alert,
   ScrollView,
   View,
+  TextInput,
   Text,
+  ToastAndroid,
   ImageBackground,
   Dimensions,
   Image,
@@ -20,24 +23,27 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import PlayGround from '../components/playGround'
 import HighwayCard from '../components/highwayNav';
 import AsyncStorage from '@react-native-community/async-storage'
-import {allAssignedContracts, getUserDetail} from '../api/apiService';
+import {allAssignedContracts, getUserDetail, hdmiVerifyCodePost} from '../api/apiService';
 import {Colors} from '../components/colors'
 import HighwayCircleCard from '../components/highwayCircleCard'
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
 import { NavigationActions, StackActions } from 'react-navigation'
+import AdvertiseButton from '../components/advertiseButton';
 
-const HighwayMenu = (props) => {    
+
+
+const HdmiVerification = (props) => {    
     const { width, height } = Dimensions.get('window');
     const [token, setToken] = useState("");
-    const [bridge, setBridge] = useState([]);
-    const [road, setRoad] = useState([]);
+    
     const [user, setUser] = useState({});
     const [userClicked, setUserClicked] = useState(false)
-    const [housing, setHousing] = useState([])
-    const [savedDatasheet, setSavedDatasheet] = useState([]);
+    const [currentHdmi, setHdmi] = useState({})
+    const [hdmiPresent, setHdmiPresent] = useState(false)
     const globalState = useContext(CounterContext);    
-    
+    const [content, changeContent] = useState("FMWH-VMP-");
+    const [isLoading, setLoading] = useState(false);
     const {state, dispatch } = globalState;
 
     console.log("iniitti", state)
@@ -87,6 +93,7 @@ const HighwayMenu = (props) => {
               let userDetails = parsifiedResult.userDetails;
               let { user_token } = userDetails;
               console.log(user_token)
+              setToken(user_token);
               getUserDetail(user_token)
               .then((data) => {
               console.log("userfffffl", data)
@@ -106,14 +113,7 @@ const HighwayMenu = (props) => {
           else {
               return ;
           }
-          // allAssignedContracts(state.userDetails.user_token)
-          // .then((data) => {
-          //   console.log("lllllllllllllllllllll", data)
-          //   setRoad(data.road);
-          //   setBridge(data.bridge);
-          //   setHousing(data.housing);
-            
-          // })
+        
         })
         
       
@@ -121,20 +121,55 @@ const HighwayMenu = (props) => {
             
     }, []);
 
-const roadExist = road.length==0?false:true;
-const bridgeExist = bridge.length==0?false:true;
-const housingExist = housing.length==0?false:true;
-/*
-
-<View style={{backgroundColor:'white', flexDirection:'row',marginTop:20,marginBottom:10, justifyContent:'space-evenly', flexWrap:'wrap'}}>
-      <HighwayCard iconName="road" title="Saved Inspection Datasheets" navigation={props.navigation} link="AllSavedDatasheets" />
-      <HighwayCard iconName="envelope" title="View/Send Messages" navigation={props.navigation} link="Messages" />
-      <HighwayCard iconName="water" title="Completed Road/Bridge" link="" />
+    const showToastWithGravity = (msg) => {
+        ToastAndroid.showWithGravity(
+          msg,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+      };
+    
+const submitHdmiContent = () => {
+    if(content.length>10){
+        isLoading(true)
+        let formData = new FormData();
+        formData.append('code', content);
+        
+        
+        hdmiVerifyCodePost(formData, token).then((data) => {
+          if(data.success==false){
+            isLoading(false)
+            Alert.alert(
+              "Error",
+              data.message,
+              [
+               
+                {
+                  text: "OK",
+                  onPress: () => console.log("Cancel Pressed"),
+                  style: "cancel"
+                },
+                
+              ],
+              { cancelable: false }
+            );
+        
+          }
+          else {
+            
+            // props.navigation.navigate('HighwayMenu')
+            isLoading(false)
+            showToastWithGravity(data.message)
+            console.log("hdmi datas",data)
+          }
+        })
+    }
+   else {
+    showToastWithGravity("Invalid HDMI Code")
+   }
   
-    </View>
-*/ 
+}
 
-console.log(roadExist, bridgeExist, housingExist)
 
   return (
     <View style={{flex:1}}> 
@@ -162,16 +197,15 @@ console.log(roadExist, bridgeExist, housingExist)
         fontWeight:'bold', 
         fontSize:22,
         marginLeft:40}}>Hello! {user.firstName}</Text>
-        <Text style={{fontSize:12,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
-        Welcome to your Dashboard. You can perform Administrative Tasks from here. Click the Menu below
+        <Text style={{fontSize:15,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        HDMI Verification Page
         </Text>
         <ScrollView horizontal 
         showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>
          <HighwayCircleCard iconName="road" navigation={props.navigation} link="AllSavedDatasheets" title="Saved Inspection Datasheets"/>
          <HighwayCircleCard iconName="envelope" title="View/Send Messages" navigation={props.navigation} link="Messages"/>
          <HighwayCircleCard iconName="water" title="Create A New Datasheet" navigation={props.navigation} link="UploadMenu"/>
-         <HighwayCircleCard iconName="user" title="Verify HDMI Users" navigation={props.navigation} link="HdmiVerification"/>
-     
+        
 
         </ScrollView>
     </ImageBackground>
@@ -186,145 +220,35 @@ console.log(roadExist, bridgeExist, housingExist)
   marginTop:30
     }}>
      
-
-     
-    <View style={{margin:20}}/>
-
+    <View style={{marginBottom:20, marginTop:20}}>
+            <Text style={[styles.title,{marginBottom:20}]}>Enter HDMI Code</Text> 
+            
+            <View style={[styles.eachCard]}>
+                <TextInput 
+                textAlignVertical={'top'}
+                value={content}
+                placeholder="FMWH-VMP-0000000000" 
+                multiline={true}
+                style={{marginLeft:20,fontSize:20, fontFamily:'AdobeClean-Regular',}}
+                onChangeText={(text) => changeContent(text)}
+                />
+            </View>
+            {!isLoading &&
+            <AdvertiseButton title="Check HDMI" handleSubmit={()=>submitHdmiContent()}/>
+            }
+            {isLoading &&
+            <ActivityIndicator size="large" color="#07411D" />
+            }
+            </View>
 
     <View>
-    {housingExist&&
-      <Text style={styles.contractTitle}>Housing Contract Your are Assigned To</Text>
-    }
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {housing.map((contract) => (
-             <TouchableOpacity onPress={() => props.navigation.navigate('SelectDatasheet', {
-              id: contract.id,
-              type: "housing",
-              title: contract.title,
-              token:token
-            })}>
-            <View style={[styles.eachCard]}>
-              <Text style={styles.title}>{contract.title}</Text>
-              <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-              <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-              <Text style={styles.state}>{contract.contractor}</Text>           
-            </View>
-            </TouchableOpacity>
-            
-          
-          ))}
-      </ScrollView>
+ 
+  
       </View>  
       
-      <ScrollView>
-      {bridgeExist&&
-      <Text style={styles.contractTitle}>Bridge Contract Your are Assigned To</Text>
-}
-<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    
     
 
 
-    {bridge.map((contract) => (
-        <TouchableOpacity onPress={() => props.navigation.navigate('SelectDatasheet', {
-          id: contract.id,
-          type: "road",
-          token:token,
-          title: contract.title,
-        })}>
-      <View style={[styles.eachCard]}>
-      <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
-        {/* 
-        <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-        <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-        <Text style={styles.state}>{contract.contractor}</Text>            */}
-        <View style={{alignSelf:'center'}}>
-        <ProgressCircle
-      percent={contract.current_percentage}
-      radius={40}
-      borderWidth={5}
-      color="#086321"
-      shadowColor="#F2F5F3"
-      bgColor="#fff"
-      containerStyle={{shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 9,
-      },
-      shadowOpacity: 0.50,
-      shadowRadius: 12.35,
-      
-      elevation: 19,}}
-  >
-      <Text style={{ fontSize: 18, fontFamily:'Candara' }}>{Math.round(contract.current_percentage)}%</Text>
-  </ProgressCircle>
-  </View>
-  <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
-  <Text style={styles.state}>{Truncator(contract.contractor, 20)}</Text>
-  <Text style={styles.title}>{contract.state}</Text>
-      </View>
-      </TouchableOpacity>
-
-      
-    
-    ))}
-</ScrollView>
-      </ScrollView> 
-
-    <ScrollView>
-       {roadExist&&
-      <Text style={styles.contractTitle}>Road Contract Your are Assigned To</Text>
-       }
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    
-    
-
-
-          {road.map((contract) => (
-              <TouchableOpacity onPress={() => props.navigation.navigate('SelectDatasheet', {
-                id: contract.id,
-                type: "road",
-                token:token,
-                title: contract.title,
-              })}>
-            <View style={[styles.eachCard]}>
-            <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
-              {/* 
-              <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-              <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-              <Text style={styles.state}>{contract.contractor}</Text>            */}
-              <View style={{alignSelf:'center'}}>
-              <ProgressCircle
-            percent={contract.current_percentage}
-            radius={40}
-            borderWidth={5}
-            color="#086321"
-            shadowColor="#F2F5F3"
-            bgColor="#fff"
-            containerStyle={{shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 9,
-            },
-            shadowOpacity: 0.50,
-            shadowRadius: 12.35,
-            
-            elevation: 19,}}
-        >
-            <Text style={{ fontSize: 18, fontFamily:'Candara' }}>{Math.round(contract.current_percentage)}%</Text>
-        </ProgressCircle>
-        </View>
-        <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
-        <Text style={styles.state}>{Truncator(contract.contractor, 20)}</Text>
-        <Text style={styles.title}>{contract.state}</Text>
-            </View>
-            </TouchableOpacity>
-
-            
-          
-          ))}
-      </ScrollView>
-      </ScrollView>     
   </ScrollView>
  
 </View>
@@ -337,7 +261,7 @@ console.log(roadExist, bridgeExist, housingExist)
 
 
 
-export default HighwayMenu;
+export default HdmiVerification;
 
 const styles = StyleSheet.create({
     cardParent: {
@@ -375,9 +299,10 @@ const styles = StyleSheet.create({
     eachCard: {
       margin:10,
       backgroundColor:'white', 
-      width:150, 
+     width:'85%',
       borderRadius:10,
-      height:250,
+      height:100,
+      alignSelf:'center',
       justifyContent:'center',
       shadowColor: "#000",
 shadowOffset: {
