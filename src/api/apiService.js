@@ -303,11 +303,12 @@ export async function viewSingleMessage(id,userToken) {
 }
 
 
-export async function viewAllContracts() {
+export async function viewAllContracts(user_token) {
     try {
         let feeds = await fetch(`${baseUrl}view_all_contract`, {
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${user_token}`
             }
         });
         let result = await feeds.json();
@@ -359,8 +360,7 @@ export async function doSearchContract(formData) {
     }
 }
 
-export async function doLogin(formData) {   
-    
+export async function doLogin(formData) {
     try {
         let feeds = await fetch(`${baseUrl}login`, {
             method: 'post',

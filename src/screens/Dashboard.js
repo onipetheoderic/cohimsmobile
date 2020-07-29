@@ -1,7 +1,18 @@
 
 import React, {useState, useEffect, useContext} from 'react';
-import {View, Alert, ActivityIndicator, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
+import {
+  View, 
+  Alert, 
+  ActivityIndicator, 
+  Text,ScrollView, 
+  ImageBackground,
+  TouchableOpacity, 
+  StatusBar, 
+  Dimensions, 
+  Image, 
+  StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-community/async-storage'
 import { TextInput } from 'react-native-gesture-handler';
@@ -10,10 +21,13 @@ import SignInButton from '../components/signInButton';
 import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'  
 import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 import {Foods} from '../api/foods';
-import {viewAllContracts, doSearchContract} from '../api/apiService';
+import {viewAllContracts,  getUserDetail, doSearchContract} from '../api/apiService';
 import HeaderAdmin from '../components/headerAdmin';
+import HighwayCircleCard from '../components/highwayCircleCard'
 import { CounterContext } from "../../store";
-
+import Truncator from "../helpers/truncator";
+import Currency from '../helpers/currency';
+import ProgressCircle from 'react-native-progress-circle'
 
 const data = [
   { state: "o", earnings: 0 },
@@ -59,12 +73,16 @@ const DashboardScreen = (props) => {
   const [housing, setHousing] = useState([]);
   const [national, setNational] = useState([]);
   const [works, setWorks] = useState([]);
+  const [hdmi, setHdmi] = useState([]);
+  const [spu, setSpu] = useState([]);
+  const [userClicked, setUserClicked] = useState(false)
   const [searchValue, setSearchValue] = useState("");
-  const [contracts, setContracts] = useState([])
+  const [contracts, setContracts] = useState([]);
+  const [user, setUser] = useState({});
   const [isLoading, setLoading] = useState(true)
     const { width, height } = Dimensions.get('window');
     const globalState = useContext(CounterContext); 
-   
+    const {state, dispatch } = globalState;
 
     const handlePress = () => {
         console.log("all")
@@ -72,50 +90,86 @@ const DashboardScreen = (props) => {
     
     
 const colorDeterminant = (contract_default, int_default) => {
+  if(contract_default!=undefined && int_default!=undefined){
     if(contract_default===true || int_default===true){
-        return "red"
-    }
-    else return Colors.mainGreen;
+      return "red"
+  }
+  else return Colors.mainGreen;
+  }
+    
 }
 const _default = (str) => {
-    if(str === true){
+    if(str!=undefined){
+      if(str === true){
         return "Yes"
     }
     else return "No"
+    }
+    
 }
 
 
 //viewAllContracts
 
 useEffect(() => {
+ 
+  setLoading(true)
 
-  const {state, dispatch } = globalState;
-console.log("the dashbord admin Screen state", state)
-setLoading(false)
-if(state.isLoggedIn==true)
-{
-  setContracts([])
-  viewAllContracts().then((data) => {
-    
-    console.log("all Datas", data)
-    let housing_data = data.housing;
-    let works_data = data.works;
-    let national_data = data.national;
-    setHousing(housing_data);
-    setNational(national_data);
-    setWorks(works_data)
-    console.log("housoing", housing_data);
-    console.log("works", works_data);
-    console.log("national", national_data);
-    setLoading(false)
+  AsyncStorage.getItem("@SessionObj")
+        .then((result)=>{          
+            let parsifiedResult = JSON.parse(result);
+            if(parsifiedResult!=null){
+              let userDetails = parsifiedResult.userDetails;
+              let { user_token } = userDetails;
+              console.log(user_token)
+              getUserDetail(user_token)
+              .then((data) => {
+              console.log("userfffffl", data)
+            
+              setUser(data.user);
+              dispatch({ type: 'newUser',payload:{user:data.user, token:user_token}})
+              setContracts([])
+              viewAllContracts(user_token).then((data) => {
+                
+                console.log("all Datas", data)
+                let housingData = data.housing;
+                let worksData = data.works;
+                let spuData = data.spu == undefined ? [] : data.spu
+                let hdmiData = data.hdmi == undefined ? [] : data.hdmi
+               
+                setHousing(housingData);  
+                setWorks(worksData);
+                setHdmi(hdmiData);
+                setSpu(spuData);
+                setLoading(false)
+              })
+            
+            })
+          }
+        })
+
+}, []);
+
+
+const logOut = () => {
+  let store = async () => await AsyncStorage.removeItem('@SessionObj')
+  store().then(() => {
+      console.warn('Logout successfully')
+     
+      const resetAction = StackActions.reset({
+          index: 0,
+          actions: [
+              NavigationActions.navigate({
+                  routeName: "LoginScreen"
+              })
+          ]
+      });
+      dispatch({ type: 'logOut',payload:{}})
+      props.navigation.dispatch(resetAction);
+  }).catch((err) => {
+      console.warn('Logout failed', err.message)
   })
 }
-else {
-  setLoading(false)
-  props.navigation.navigate('LoginScreen')
-  
-}
-}, []);
 
 const setQuery = (val) => {
  
@@ -135,11 +189,12 @@ const setQuery = (val) => {
      
     })
   }
-  
- 
 }
+const isWorksPresent = works.length > 0 ? true : false
+const isSpuPresent = spu.length > 0 ? true : false
+const isHousingPresent = housing.length > 0 ? true : false;
+const isHdmiPresent = hdmi.length > 0 ? true : false;
 
-// 
 if (isLoading) {
   return (
     <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -148,14 +203,51 @@ if (isLoading) {
   )
 }  
   return (
-
-    <ScrollView style={{backgroundColor:'white'}}>
-      <StatusBar translucent={true} backgroundColor="transparent"/>
-      <HeaderAdmin title="Contract Administrative Portal" navigation={props.navigation}/>
-      <View style={{marginTop:40, justifyContent:'center'}}>
-      <Text style={{fontFamily:'Candara',textAlign:'center', fontSize:25}}>Ongoing Projects</Text>
+<View style={{flex:1}}>
+<View style={{backgroundColor:'green', flex: 2}}>
+    <ImageBackground
+        style={styles.image}
+        source={require('../../assets/images/unnamed2.jpg')}
+    >
+    <View style={{marginTop:26, marginRight:10, alignItems:'flex-end'}}>
+      <TouchableOpacity onPress={()=>setUserClicked(!userClicked)}>
+      <FontAwesome5 name="user" size={20} color="white" />
+      </TouchableOpacity>
+    {userClicked &&
+      <View style={{borderRadius:7, backgroundColor:'white', position:'absolute', top:25, width:60, height:30, justifyContent:'center'}}>
+        <TouchableOpacity onPress={()=>logOut()}>
+          <Text style={{color:'black', fontFamily:'Candara', textAlign:'center'}}>Logout</Text>
+        </TouchableOpacity>       
       </View>
-  
+      }
+    </View>
+      <Text style={{
+        marginTop:20,
+        color:'white',
+        fontWeight:'bold', 
+        fontSize:22,
+        marginLeft:40}}>Hello! {user.firstName}</Text>
+        <Text style={{fontSize:12,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        Welcome to your Dashboard. You can perform Administrative Tasks from here. Click the Menu below
+        </Text>
+        <ScrollView horizontal 
+        showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>
+      
+         <HighwayCircleCard iconName="envelope" title="Send/Broadcast Messages" navigation={props.navigation} link="AdminMessage"/>
+         {/* <HighwayCircleCard iconName="file-contract" title="View All Contracts" navigation={props.navigation} link="AllContracts"/> */}
+         <HighwayCircleCard iconName="user" title="Show All Engineers" navigation={props.navigation} link="HdmiVerification"/>
+     
+
+        </ScrollView>
+    </ImageBackground>
+</View> 
+<View style={{flex:2.6,backgroundColor:'white',
+    borderTopRightRadius:40, 
+    marginTop:-30,
+    borderTopLeftRadius:40,}}>
+    
+    <ScrollView style={{marginTop:30}}>
+       
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>          
         <VictoryChart domainPadding={0} width={1050} height={300}
         theme={VictoryTheme.material}>
@@ -197,10 +289,11 @@ if (isLoading) {
         ))}
        
       </View>
-
+{isWorksPresent &&
       <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>All Roads and Bridges Contract</Text>
+      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest Works Contracts Across Nigeria</Text>
       </View>
+      }
       <ScrollView horizontal>
           {works.map((contract) => (
                <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
@@ -208,106 +301,246 @@ if (isLoading) {
                 title: contract.project_title,
                 type_of_project: contract.type
               })}>
-            <View style={[styles.eachCard, {backgroundColor:colorDeterminant(contract.contractor_default,contract.internal_default)}]}>
-            <Text style={styles.title}>{contract.project_title}</Text>
-            <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-            <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-            <Text style={styles.state}>{contract.contractor_name}</Text>
-           <View style={{marginTop:20}}>
-                <Text style={styles.default}>Internal default:{_default(contract.internal_default)}</Text>
-                <Text style={styles.default}>Contractor's default:{_default(contract.contractor_default)}</Text>
+                <View style={[styles.eachCard]}>
+            <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
+             
+              <View style={{alignSelf:'center'}}>
+              <ProgressCircle
+            percent={contract.current_percentage}
+            radius={40}
+            borderWidth={5}
+            color={colorDeterminant(contract.contractor_default,contract.internal_default)}
+            shadowColor="#F2F5F3"
+            bgColor="#fff"
+            containerStyle={{shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 9,
+            },
+            shadowOpacity: 0.50,
+            shadowRadius: 12.35,
+            
+            elevation: 19,}}
+        >
+            <Text style={{ fontSize: 18, fontFamily:'Candara' }}>
+              {Math.round(contract.current_percentage)}%</Text>
+        </ProgressCircle>
+        </View>
+        <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
+        <Text style={styles.state}>{Truncator(contract.contractor_name, 20)}</Text>
+        <Text style={styles.title}>{contract.state}</Text>
             </View>
+           
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+{isHousingPresent &&
+        <View style={{marginLeft:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest Housing Contracts Across Nigeria</Text>
+      </View>
+      }
+      <ScrollView horizontal>
+          {housing.map((contract) => (
+                <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
+                 id: contract.id,
+                 title: contract.project_title,
+                 type_of_project: contract.type
+               })}>
+                 <View style={[styles.eachCard]}>
+             <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
+              
+               <View style={{alignSelf:'center'}}>
+               <ProgressCircle
+             percent={contract.current_percentage}
+             radius={40}
+             borderWidth={5}
+             color={colorDeterminant(contract.contractor_default,contract.internal_default)}
+             shadowColor="#F2F5F3"
+             bgColor="#fff"
+             containerStyle={{shadowColor: "#000",
+             shadowOffset: {
+               width: 0,
+               height: 9,
+             },
+             shadowOpacity: 0.50,
+             shadowRadius: 12.35,
+             
+             elevation: 19,}}
+         >
+             <Text style={{ fontSize: 18, fontFamily:'Candara' }}>
+               {Math.round(contract.current_percentage)}%</Text>
+         </ProgressCircle>
+         </View>
+         <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
+         <Text style={styles.state}>{Truncator(contract.contractor_name, 20)}</Text>
+         <Text style={styles.title}>{contract.state}</Text>
+             </View>
+            
+             </TouchableOpacity>
+          ))}
+
+        </ScrollView>
+
+
+        {isSpuPresent &&
+      <View style={{marginLeft:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest SPU Contracts Across Nigeria</Text>
+      </View>
+      }
+      <ScrollView horizontal>
+          {spu.map((contract) => (
+               <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
+                id: contract.id,
+                title: contract.project_title,
+                type_of_project: contract.type
+              })}>
+                <View style={[styles.eachCard]}>
+            <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
+             
+              <View style={{alignSelf:'center'}}>
+              <ProgressCircle
+            percent={contract.current_percentage}
+            radius={40}
+            borderWidth={5}
+            color={colorDeterminant(contract.contractor_default,contract.internal_default)}
+            shadowColor="#F2F5F3"
+            bgColor="#fff"
+            containerStyle={{shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 9,
+            },
+            shadowOpacity: 0.50,
+            shadowRadius: 12.35,
+            
+            elevation: 19,}}
+        >
+            <Text style={{ fontSize: 18, fontFamily:'Candara' }}>
+              {Math.round(contract.current_percentage)}%</Text>
+        </ProgressCircle>
+        </View>
+        <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
+        <Text style={styles.state}>{Truncator(contract.contractor_name, 20)}</Text>
+        <Text style={styles.title}>{contract.state}</Text>
             </View>
+           
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>All Housing Contract</Text>
+        {isHdmiPresent &&
+      <View style={{marginLeft:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest HDMI Contracts Across Nigeria</Text>
       </View>
+      }
       <ScrollView horizontal>
-          {housing.map((contract) => (
+          {hdmi.map((contract) => (
                <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
                 id: contract.id,
                 title: contract.project_title,
                 type_of_project: contract.type
               })}>
-            <View style={[styles.eachCard, {backgroundColor:colorDeterminant(contract.contractor_default,contract.internal_default)}]}>
-            <Text style={styles.title}>{contract.project_title}</Text>
-            <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-            <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-            <Text style={styles.state}>{contract.contractor_name}</Text>
-           <View style={{marginTop:20}}>
-                <Text style={styles.default}>Internal default:{_default(contract.internal_default)}</Text>
-                <Text style={styles.default}>Contractor's default:{_default(contract.contractor_default)}</Text>
+                <View style={[styles.eachCard]}>
+            <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
+             
+              <View style={{alignSelf:'center'}}>
+              <ProgressCircle
+            percent={contract.current_percentage}
+            radius={40}
+            borderWidth={5}
+            color={colorDeterminant(contract.contractor_default,contract.internal_default)}
+            shadowColor="#F2F5F3"
+            bgColor="#fff"
+            containerStyle={{shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 9,
+            },
+            shadowOpacity: 0.50,
+            shadowRadius: 12.35,
+            
+            elevation: 19,}}
+        >
+            <Text style={{ fontSize: 18, fontFamily:'Candara' }}>
+              {Math.round(contract.current_percentage)}%</Text>
+        </ProgressCircle>
+        </View>
+        <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
+        <Text style={styles.state}>{Truncator(contract.contractor_name, 20)}</Text>
+        <Text style={styles.title}>{contract.state}</Text>
             </View>
-            </View>
+           
             </TouchableOpacity>
           ))}
         </ScrollView>
-        <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>All National Roads Contract</Text>
-      </View>
-      <ScrollView horizontal>
-          {national.map((contract) => (
-               <TouchableOpacity onPress={() => props.navigation.navigate('SingleContractPage', {
-                id: contract.id,
-                title: contract.project_title,
-                type_of_project: contract.type
-              })}>
-            <View style={[styles.eachCard, {backgroundColor:colorDeterminant(contract.contractor_default,contract.internal_default)}]}>
-            <Text style={styles.title}>{contract.project_title}</Text>
-            <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-            <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-            <Text style={styles.state}>{contract.contractor_name}</Text>
-           <View style={{marginTop:20}}>
-                <Text style={styles.default}>Internal default:{_default(contract.internal_default)}</Text>
-                <Text style={styles.default}>Contractor's default:{_default(contract.contractor_default)}</Text>
-            </View>
-            </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        
+
+
+
+
       </ScrollView>
+      </View>
+
+      </View>
   );
 };
 
 const styles = StyleSheet.create({
-    eachCard: {
-        margin:10,
-        backgroundColor:Colors.mainGreen, 
-        width:150, 
-        borderRadius:10,
-        height:250
-    },
+  eachCard: {
+    margin:10,
+    backgroundColor:'white', 
+    width:150, 
+    borderRadius:10,
+    height:250,
+    justifyContent:'center',
+    shadowColor: "#000",
+shadowOffset: {
+width: 0,
+height: 9,
+},
+shadowOpacity: 0.50,
+shadowRadius: 12.35,
+
+elevation: 19,
+},
+
+image: {
+  height:'100%',
+   resizeMode: "cover",
+ 
+ },
+
+
     default: {
         fontSize:10,
         color:'white',
         textAlign:'center'
     },
-    title: {
-        marginTop:10, 
-        textAlign:'center',
-        color:'white',
-        fontFamily:'Candara', 
-        fontSize:18
-    },
-    state: {
-        marginTop:10, 
-        textAlign:'center',
-        color:'white',
-        fontFamily:'Candara', 
-        fontSize:15,
-        
-    },
-    currentPercentage: {
-        marginTop:10, 
-        textAlign:'center',
-        color:'white',
-        fontFamily:'Candara', 
-        fontSize:37,
-    },
+   
+  title: {
+    marginTop:10, 
+    marginBottom:20,
+    textAlign:'center',
+    color:'#095A1F',
+    fontFamily:'Candara', 
+    fontSize:13,
+    
+},
+state: {
+    marginTop:5, 
+    textAlign:'center',
+    color:'#095A1F',
+    fontFamily:'Candara', 
+    fontSize:15,
+    
+},
+currentPercentage: {
+    marginTop:10, 
+    textAlign:'center',
+    color:'white',
+    fontFamily:'Candara', 
+    fontSize:37,
+},
+
 
     container: {
         flex: 1,

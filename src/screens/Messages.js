@@ -54,10 +54,10 @@ const HighwayMenu = (props) => {
         changeShowMsg(true)
     }
 //userToken
-const fetchFeeds = () => {
+const fetchFeeds = (user_token) => {
     const {state, dispatch } = globalState;
-    console.log("this is the state", state) 
-    viewAllMessages(state.userDetails.user_token).then((data) => {
+    console.log("the tokenHHHHHHH", user_token)
+    viewAllMessages(user_token).then((data) => {
         if(data.success==true){
             console.log("datas gotten from api", data)
            
@@ -73,10 +73,9 @@ const fetchFeeds = () => {
     })    
 }
 
-const fetchUserSection = () => {
-    const {state, dispatch } = globalState;
-    console.log("this is the state", state) 
-    usersInSection(state.userDetails.user_token).then((data) => {
+const fetchUserSection = (user_token) => {
+    
+    usersInSection(user_token).then((data) => {
         console.log("the DAATA",data)
         if(data.success==true){
             changeAllUser(data.users)
@@ -84,9 +83,20 @@ const fetchUserSection = () => {
     })
 }
 
-useEffect(() => {
-    fetchFeeds()
-    fetchUserSection()
+useEffect(() => {    
+    AsyncStorage.getItem("@SessionObj")
+    .then((result)=>{          
+        let parsifiedResult = JSON.parse(result);
+        if(parsifiedResult!=null){
+          let userDetails = parsifiedResult.userDetails;
+          let { user_token } = userDetails;
+          console.log("thy token",user_token)
+          setToken(user_token);
+            fetchFeeds(user_token)
+            fetchUserSection(user_token)
+        }
+    })     
+    
   }, []);
 
 const handleInfiniteScroll = () => { 
@@ -94,7 +104,7 @@ const handleInfiniteScroll = () => {
       changeCurrentPage({
         currentPage: currentPage + 1,
       }, () => {
-        viewAllMessages(state.userDetails.user_token).then((data) => {
+        viewAllMessages(token).then((data) => {
             setMsgs(data.msgs)
             changeIsRefreshing(false)
         }).catch((e) => {
@@ -111,7 +121,7 @@ const handleInfiniteScroll = () => {
 */ 
 const submitMessage = () =>{
     const {state, dispatch } = globalState;
-    console.log(subject.subject, content.content, selectedUser)
+   
     setLoading(true)
     if(subject.length<=10){
         showToastWithGravity("Subject must be atleast 10 characters")
@@ -129,7 +139,7 @@ const submitMessage = () =>{
         formData.append('recieverId', selectedUser);
         formData.append('message', content);
         formData.append('subject', subject)
-        submitMsg(formData, state.userDetails.user_token).then((data) => {
+        submitMsg(formData, token).then((data) => {
             console.log(data)
             if(data.success==true){
                 showToastWithGravity(data.msg)

@@ -1,4 +1,8 @@
 export default function truncator(str, length) {
-    var trimmedString = str.substr(0, length);
-    return trimmedString + ".."
+    console.log("GGG",str)
+    if(str!=undefined && length!=undefined){
+        var trimmedString = str.substr(0, length);
+        return trimmedString + ".."
+    }
+   
 }

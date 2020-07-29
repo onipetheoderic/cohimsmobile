@@ -1,6 +1,6 @@
 
 import React, {useState, useEffect, useContext} from 'react';
-import {View, ToastAndroid, Alert, ActivityIndicator, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
+import {View, ToastAndroid, Alert, ImageBackground, ActivityIndicator, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as Animatable from 'react-native-animatable';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -12,15 +12,19 @@ import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-nat
 import {Foods} from '../api/foods';
 import {viewAllContracts, doSearchUsers, submitMsg, doSearchContract} from '../api/apiService';
 import HeaderAdmin from '../components/headerAdmin';
+import HighwayCircleCard from '../components/highwayCircleCard';
+import Truncator from "../helpers/truncator";
+import Currency from '../helpers/currency';
 import { CounterContext } from "../../store";
 import AdvertiseButton from '../components/advertiseButton';
-
+import MsgCard from '../components/msgCards';
 const screenWidth = Dimensions.get("window").width;
 
 
 const SingleUserMessage = (props) => {
   const [housing, setHousing] = useState([]);
   const [national, setNational] = useState([]);
+  const [userClicked, setUserClicked] = useState(false)
   const [works, setWorks] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [contracts, setContracts] = useState([])
@@ -34,7 +38,7 @@ const SingleUserMessage = (props) => {
 
     const { width, height } = Dimensions.get('window');
     const globalState = useContext(CounterContext); 
-   
+    const {state, dispatch } = globalState;
 
     const handlePress = () => {
         console.log("all")
@@ -77,24 +81,27 @@ const showToastWithGravity = (msg) => {
 
 
 const submitMessage = () =>{
-    const {state, dispatch } = globalState;
+   
 
     setLoading(true)
-    if(subject.length<=10){
-        showToastWithGravity("Subject must be atleast 10 characters")
+    if(subject.length<=7){
+        showToastWithGravity("Subject must be atleast 7 characters")
+        setLoading(false)
     }
     else if(content.length<=10){
         showToastWithGravity("Content must be atleast 10 characters")
+        setLoading(false)
     }
     else if(userSelected==null || userSelected.length==0 || userSelected==" "){
         showToastWithGravity("No User is Selected")
+        setLoading(false)
     }
     else {
         let formData = new FormData();
         formData.append('recieverId', userSelected);
         formData.append('message', content);
         formData.append('subject', subject)
-        submitMsg(formData, state.userDetails.user_token).then((data) => {
+        submitMsg(formData, state.user.token).then((data) => {
             console.log(data)
             if(data.success==true){
                 showToastWithGravity(data.msg)
@@ -123,7 +130,7 @@ const setQuery = (val) => {
   let formData = new FormData();
   formData.append("query", val)
   if(val.length>=3){
-    doSearchUsers(formData, state.userDetails.user_token).then((data)=>{
+    doSearchUsers(formData, state.user.token).then((data)=>{
       console.log(data)
       if(data.users.length && data.users.length>0){
         setContracts(data.users)
@@ -139,7 +146,7 @@ const setQuery = (val) => {
 }
 //data.firstName, data.lastName, data.section
 const setSelectedUser = (id, firstName, lastName, section) => {
-    let fullName = firstName + " " + lastName
+    let fullName = firstName
     console.log("the id", id)
     changeUserSelected(id)
     changeUserSelectedFullname(fullName)
@@ -147,7 +154,10 @@ const setSelectedUser = (id, firstName, lastName, section) => {
     changeShowUsers(false)
 }
 const isUserSelected = userSelectedFullname==null?false:true;
-
+const firstName = state.user.user.firstName
+const sectionUser = () => (
+    underscoreFormatter(userSection)
+)
 if (isLoading) {
     return (
       <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -157,11 +167,53 @@ if (isLoading) {
   }  
 
   return (
+    <View style={{flex:1}}>
+    <View style={{backgroundColor:'green', flex: 2}}>
+    <ImageBackground
+        style={styles.image}
+        source={require('../../assets/images/unnamed.jpg')}
+    >
+    <View style={{marginTop:26, marginRight:10, alignItems:'flex-end'}}>
+      <TouchableOpacity onPress={()=>setUserClicked(!userClicked)}>
+      <FontAwesome5 name="user" size={20} color="white" />
+      </TouchableOpacity>
+    {userClicked &&
+      <View style={{borderRadius:7, backgroundColor:'white', position:'absolute', top:25, width:60, height:30, justifyContent:'center'}}>
+        <TouchableOpacity onPress={()=>logOut()}>
+          <Text style={{color:'black', fontFamily:'Candara', textAlign:'center'}}>Logout</Text>
+        </TouchableOpacity>       
+      </View>
+      }
+    </View>
+      <Text style={{
+        marginTop:20,
+        color:'white',
+        fontWeight:'bold', 
+        fontSize:22,
+        marginLeft:40}}>Hello! {firstName}</Text>
+        <Text style={{fontSize:15,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+       What Can I do Here?
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        You can Send message to a single User
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        Just type in the name of the user
+        </Text>
+     
+        <ScrollView horizontal 
+        showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>
+      
+       
 
-    <ScrollView style={{backgroundColor:'white'}}>
-      <StatusBar translucent={true} backgroundColor="transparent"/>
-      <HeaderAdmin title="Contract Administrative Portal" navigation={props.navigation}/>
-    
+        </ScrollView>
+    </ImageBackground>
+</View>
+<View style={{flex:2.6,backgroundColor:'white',
+    borderTopRightRadius:40, 
+    marginTop:-30,
+    borderTopLeftRadius:40,}}>
+        <ScrollView style={{marginTop:30, marginBottom:10,}}>
       <View style={{marginVertical:30}}>
         <View style={styles.textField}>
             <TextInput
@@ -192,9 +244,12 @@ if (isLoading) {
        }
 
       </View>
-    {isUserSelected &&
+      <MsgCard
+                 iconName="user-check" title={ `${userSelectedFullname} (${sectionUser()})`}/>
+    {/* {isUserSelected &&
     <View style={{height:80, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
             borderRadius:20 }}>
+                
         <View style={{flex:2, alignSelf:'center'}}>
             <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
             {userSelectedFullname}, 
@@ -205,7 +260,7 @@ if (isLoading) {
             <FontAwesome5 name="user-check" size={40} color="white" />
         </View>
     </View>
-      }
+      } */}
       {isUserSelected &&
     <View style={{marginLeft:20}}>
         <Text style={[{marginTop:20, fontWeight:'bold', fontFamily:'Candara', fontSize:15, color:'black'}]}>
@@ -238,10 +293,11 @@ if (isLoading) {
         </View>
         <AdvertiseButton title="Submit" handleSubmit={()=>submitMessage()}/>
     </View>
+
 }
-       
-      
-      </ScrollView>
+</ScrollView>
+      </View>
+      </View>
   );
 };
 
@@ -253,6 +309,11 @@ const styles = StyleSheet.create({
         borderRadius:10,
         height:250
     },
+    image: {
+        height:'100%',
+         resizeMode: "cover",
+       
+       },
     default: {
         fontSize:10,
         color:'white',

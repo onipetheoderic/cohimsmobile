@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   View,
+  ActivityIndicator,
   TextInput,
   Text,
   ToastAndroid,
@@ -45,8 +46,9 @@ const HdmiVerification = (props) => {
     const [content, changeContent] = useState("FMWH-VMP-");
     const [isLoading, setLoading] = useState(false);
     const {state, dispatch } = globalState;
+    const [otherDetails, setOtherDetails] = useState({})
+    const [singleHdmi, setSingleHdmi] = useState({})
 
-    console.log("iniitti", state)
 
     const logOut = () => {
       const {state, dispatch } = globalState;
@@ -74,41 +76,21 @@ const HdmiVerification = (props) => {
       // Return the function to unsubscribe from the event so it gets removed on unmount
     
       const {state, dispatch } = globalState;
-
-      console.log("this is the state", state)
-      let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
-        dataSheetArray().then((val) => {
-          console.log("the val", val)
-          if (val) {
-            let Datasheets = JSON.parse(val)
-            console.log("DDDDD",Datasheets)
-            dispatch({ type: 'addToDatasheetArray',payload:Datasheets})
-            setSavedDatasheet(Datasheets)          
-          }
-        })
+     
         AsyncStorage.getItem("@SessionObj")
         .then((result)=>{          
             let parsifiedResult = JSON.parse(result);
             if(parsifiedResult!=null){
               let userDetails = parsifiedResult.userDetails;
               let { user_token } = userDetails;
-              console.log(user_token)
               setToken(user_token);
               getUserDetail(user_token)
               .then((data) => {
-              console.log("userfffffl", data)
             
               setUser(data.user);
             
             })
-              allAssignedContracts(user_token)
-              .then((data) => {
-              console.log("lllllllllllllllllllll", data)
-              setRoad(data.road);
-              setBridge(data.bridge);
-              setHousing(data.housing);
-            
-            })
+           
           }
           else {
               return ;
@@ -131,14 +113,16 @@ const HdmiVerification = (props) => {
     
 const submitHdmiContent = () => {
     if(content.length>10){
-        isLoading(true)
+        setLoading(true)
         let formData = new FormData();
         formData.append('code', content);
         
         
         hdmiVerifyCodePost(formData, token).then((data) => {
           if(data.success==false){
-            isLoading(false)
+            setLoading(false)
+            setHdmiPresent(false)
+           
             Alert.alert(
               "Error",
               data.message,
@@ -156,11 +140,16 @@ const submitHdmiContent = () => {
         
           }
           else {
-            
+           
             // props.navigation.navigate('HighwayMenu')
-            isLoading(false)
+            setLoading(false)
             showToastWithGravity(data.message)
-            console.log("hdmi datas",data)
+            setHdmiPresent(true)
+           
+            let { success, single_hdmi, ...otherdetails } = data;
+            console.log(otherdetails, "X", single_hdmi)
+            setOtherDetails(otherdetails)
+            setSingleHdmi(single_hdmi)
           }
         })
     }
@@ -169,7 +158,23 @@ const submitHdmiContent = () => {
    }
   
 }
+const paidStatus = (bool) => {
+    if(bool===true){
+        return "Paid"
+    }
+    else {
+        return "Not Paid"
+    }
+}
 
+const expirationStatus = (bool) => {
+    if(bool===true){
+        return "Expired"
+    }
+    else {
+        return "Not Expired"
+    }
+}
 
   return (
     <View style={{flex:1}}> 
@@ -241,10 +246,39 @@ const submitHdmiContent = () => {
             }
             </View>
 
-    <View>
- 
-  
-      </View>  
+    {hdmiPresent &&
+    <View style={styles.detailCard}>
+        {/*  "hdmi_category": "shops", "hdmi_code": "FMWH-VMP-276521549", 
+        "hdmi_type": "vendor_market_place", "paid": true, "password": "123456", 
+        "pension_social_security_contribution": "", "phoneNumber": "07039148866", 
+        "position_in_company": "CEO", "ppp_assigned": false,
+         "project_location": "wesozobaj@mailinator.com", 
+         "project_name": "vyni@mailinator.com", 
+         "reference_paystack": "arhnr70aeo", 
+         "sworn_affidavit_crime": "1594566807107IMG_20200208_120316.jpg",
+          "sworn_affidavit_director": "", "transaction": [Array], 
+          "updatedAt": "2020-07-12T19:55:26.619Z",
+         "user_assigned": [Array], "verifiedPayment": true}] */}
+        <Text style={styles.title3}>{singleHdmi.ppp[0].fullname}</Text>
+        <Text style={styles.title2}>Position in Company: {singleHdmi.ppp[0].position_in_company}</Text>
+        <Text style={styles.title2}>Phone Number: {singleHdmi.ppp[0].phoneNumber}</Text>
+        <Text style={styles.title2}>Verified Payment: {paidStatus(singleHdmi.ppp[0].verifiedPayment)}</Text>
+        <Text style={styles.title2}>Project Location: {singleHdmi.ppp[0].project_location}</Text>
+        <Text style={styles.title2}>Project Name: {singleHdmi.ppp[0].project_name}</Text>
+        <Text style={styles.title2}>Company Name: {singleHdmi.ppp[0].company_name}</Text>
+        <Text style={styles.title2}>Company Start Date: {singleHdmi.ppp[0].company_dob}</Text>
+        <Text style={styles.title2}>HDMI Category: {singleHdmi.ppp[0].hdmi_category}</Text>
+        <Text style={styles.title2}>Admin Verified: {singleHdmi.ppp[0].admin_verified}</Text>
+        <Text style={styles.title2}>HDMI Type: {singleHdmi.ppp[0].hdmi_type}</Text>
+        <Text style={styles.title2}>Paid: {paidStatus(singleHdmi.ppp[0].paid)}</Text>
+        <Text style={styles.title2}>HDMI Code: {singleHdmi.ppp[0].hdmi_code}</Text>
+        <Text style={styles.title2}>Days Elapsed: {otherDetails.daysElapsedFromLicence} Days</Text>
+        <Text style={styles.title2}>Days Remaining For Licence: {otherDetails.daysRemainingInLicence} Days</Text>
+        <Text style={styles.title2}>Expiration Status: {expirationStatus(otherDetails.isExpired)}</Text>
+
+
+    </View>  
+    }
       
     
 
@@ -296,6 +330,24 @@ const styles = StyleSheet.create({
       fontSize:17,
       marginLeft:10
     },
+    detailCard: {
+        margin:10,
+      backgroundColor:'white', 
+     width:'85%',
+      borderRadius:10,
+      height:600,
+      alignSelf:'center',
+      justifyContent:'center',
+      shadowColor: "#000",
+shadowOffset: {
+	width: 0,
+	height: 9,
+},
+shadowOpacity: 0.50,
+shadowRadius: 12.35,
+
+elevation: 19,
+    },
     eachCard: {
       margin:10,
       backgroundColor:'white', 
@@ -314,7 +366,24 @@ shadowRadius: 12.35,
 
 elevation: 19,
   },
- 
+  title2: {
+    marginTop:10, 
+    marginBottom:10,
+    textAlign:'center',
+    color:'#095A1F',
+    fontFamily:'Candara', 
+    fontSize:13,
+    
+},
+title3: {
+    marginTop:10, 
+    marginBottom:10,
+    textAlign:'center',
+    color:'#095A1F',
+    fontFamily:'Candara', 
+    fontSize:17,
+    
+},
  
   title: {
     marginTop:10, 

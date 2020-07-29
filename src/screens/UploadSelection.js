@@ -39,8 +39,6 @@ const UploadSelection = (props) => {
     
     const {state, dispatch } = globalState;
 
-    console.log("iniitti", state)
-
      
 
     useEffect(() => {

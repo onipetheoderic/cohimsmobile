@@ -12,7 +12,7 @@ import {
   Platform,
   PickerIOS,
   FlatList,
-  
+  ImageBackground,
   ActivityIndicator,
   Text,
   Dimensions,
@@ -32,12 +32,18 @@ import {Colors} from '../components/colors'
 import TimeAgo from 'react-native-timeago';
 import * as Animatable from 'react-native-animatable';
 import HeaderAdmin from '../components/headerAdmin';
+import HighwayCircleCard from '../components/highwayCircleCard';
+import Truncator from "../helpers/truncator";
+import Currency from '../helpers/currency';
+import ProgressCircle from 'react-native-progress-circle'
 
+import MsgCard from '../components/msgCards'
 
 const HighwayMenu = (props) => {    
     const { width, height } = Dimensions.get('window');
     const [token, setToken] = useState("");
     const [content, changeContent] = useState("");
+    const [userClicked, setUserClicked] = useState(false)
     const [msgs, setMsgs] = useState([]);
     const [selectedUser, setSelectedUsers] = useState(null)
     const globalState = useContext(CounterContext);
@@ -48,16 +54,16 @@ const HighwayMenu = (props) => {
     const [isRefreshing, changeIsRefreshing] = useState(false);
     const [allSections, changeAllSection] = useState([])
     const [subject, changeSubject] = useState(null);
-
+    const {state, dispatch } = globalState;
    //submitMsg
     const showMsgBox = () => {
         changeShowMsg(true)
     }
 //userToken
 const fetchFeeds = () => {
-    const {state, dispatch } = globalState;
+    
     console.log("this is the state", state) 
-    viewAllMessages(state.userDetails.user_token).then((data) => {
+    viewAllMessages(state.user.token).then((data) => {
         if(data.success==true){
             console.log("datas gotten from api", data)
            
@@ -75,9 +81,9 @@ const fetchFeeds = () => {
 
 const fetchSections = () => {
     setLoading(true)
-    const {state, dispatch } = globalState;
+    
     console.log("this is the state", state) 
-    getAllSections(state.userDetails.user_token).then((data) => {
+    getAllSections(state.user.token).then((data) => {
         console.log("the DAATA",data)
         if(data.success==true){
             changeAllSection(data.users)
@@ -95,7 +101,7 @@ const handleInfiniteScroll = () => {
       changeCurrentPage({
         currentPage: currentPage + 1,
       }, () => {
-        viewAllMessages(state.userDetails.user_token).then((data) => {
+        viewAllMessages(state.user.token).then((data) => {
             setMsgs(data.msgs)
             changeIsRefreshing(false)
         }).catch((e) => {
@@ -106,9 +112,7 @@ const handleInfiniteScroll = () => {
     }
 }
 
-const submitMessage = () =>{
-    const {state, dispatch } = globalState;
-    
+const submitMessage = () =>{    
     setLoading(true)
     if(subject.length<=10){
         showToastWithGravity("Subject must be atleast 10 characters")
@@ -123,7 +127,7 @@ const submitMessage = () =>{
         let formData = new FormData();
         formData.append('message', content);
         formData.append('subject', subject)
-        BroadcastMsgToAllUsers(formData, state.userDetails.user_token).then((data) => {
+        BroadcastMsgToAllUsers(formData, state.user.token).then((data) => {
             console.log(data)
             if(data.success==true){
                 showToastWithGravity(data.message)
@@ -169,7 +173,8 @@ const showToastWithGravity = (msg) => {
       ToastAndroid.CENTER
     );
   };
- 
+ console.log("the HHHHHHHHHH", state.user.user.firstName)
+ const firstName = state.user.user.firstName
 
   return (
 
@@ -212,50 +217,64 @@ const showToastWithGravity = (msg) => {
       
 </Animatable.View>
     }
-   <HeaderAdmin title="Contract Administrative Portal" navigation={props.navigation}/>
-   <TouchableOpacity onPress={()=>props.navigation.navigate('SingleUserMessage')}>
-   <View style={{height:110, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
-            borderRadius:20 }}>
-        <View style={{flex:2, alignSelf:'center'}}>
-            <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
-            Send Message to a Single User
-            </Text>
-            
-        </View>
-        <View style={{flex:1, alignSelf:'center'}}>
-        <FontAwesome5 name="user-check" size={60} color="white" />
-        </View>
+   
+   
+   
+   <View style={{backgroundColor:'green', flex: 2}}>
+    <ImageBackground
+        style={styles.image}
+        source={require('../../assets/images/unnamed.jpg')}
+    >
+    <View style={{marginTop:26, marginRight:10, alignItems:'flex-end'}}>
+      <TouchableOpacity onPress={()=>setUserClicked(!userClicked)}>
+      <FontAwesome5 name="user" size={20} color="white" />
+      </TouchableOpacity>
+    {userClicked &&
+      <View style={{borderRadius:7, backgroundColor:'white', position:'absolute', top:25, width:60, height:30, justifyContent:'center'}}>
+        <TouchableOpacity onPress={()=>logOut()}>
+          <Text style={{color:'black', fontFamily:'Candara', textAlign:'center'}}>Logout</Text>
+        </TouchableOpacity>       
+      </View>
+      }
     </View>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={()=>props.navigation.navigate('SendMsgToSection')}>
-    <View style={{height:110, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
-            borderRadius:20 }}>
-        <View style={{flex:2, alignSelf:'center'}}>
-            <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
-            Broadcast Message to All Users In a Section
-            </Text>
-            
-        </View>
-        <View style={{flex:1, alignSelf:'center'}}>
-        <FontAwesome5 name="user-friends" size={60} color="white" />
-        </View>
-    </View>
-</TouchableOpacity>
-<TouchableOpacity onPress={()=>changeShowMsg(true)}>
-    <View style={{height:110, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
-            borderRadius:20 }}>
-        <View style={{flex:2, alignSelf:'center'}}>
-            <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
-            Broadcast Message to All Users
-            </Text>
-            
-        </View>
-        <View style={{flex:1, alignSelf:'center'}}>
-        <FontAwesome5 name="users" size={60} color="white" />
-        </View>
-    </View>
-    </TouchableOpacity>
+      <Text style={{
+        marginTop:20,
+        color:'white',
+        fontWeight:'bold', 
+        fontSize:22,
+        marginLeft:40}}>Hello! {firstName}</Text>
+        <Text style={{fontSize:15,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+       What Can I do Here?
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        You can Send message to a single User
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        You can BroadCast message to all Users in a Section
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        You can Send message to all Users
+        </Text>
+        <ScrollView horizontal 
+        showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>
       
+       
+
+        </ScrollView>
+    </ImageBackground>
+</View>
+<View style={{flex:2.6,backgroundColor:'white',
+    borderTopRightRadius:40, 
+    marginTop:-30,
+    borderTopLeftRadius:40,}}>
+
+<ScrollView style={{marginTop:30, marginBottom:10,}}>
+    <MsgCard onPress={()=>props.navigation.navigate('SingleUserMessage')} iconName="user-check" title="Send Message to a Single User"/>
+    <MsgCard onPress={()=>props.navigation.navigate('SendMsgToSection')} iconName="user-friends" title="Broadcast Message to All Users In a Section"/>
+    <MsgCard onPress={()=>changeShowMsg(true)} iconName="users" title="Broadcast Message to All Users"/>
+   
+    </ScrollView>
+    </View>
   </>
   );
 };
@@ -272,7 +291,11 @@ const styles = StyleSheet.create({
         backgroundColor:'green',
         width:'42%',
     },
-    
+    image: {
+        height:'100%',
+         resizeMode: "cover",
+       
+       },
     text: {
         fontFamily: "Candara",
         color: "#3e3e3e",

@@ -10,6 +10,7 @@ const initialState = {
     userDetails:null,
     isSuper:false,
     deviseToken:null,
+    user:null
 };
 
 const getUser = async () => {
@@ -51,8 +52,10 @@ export const CounterContextProvider = props => {
         case 'updateUser':
             return {...state, userDetails:action.payload}
 
+        case 'newUser':
+            return {...state, user:action.payload}
+
         case 'loginUser':          
-        console.log("Context",props)
           return {
             ...state, 
             userDetails: action.payload.userDetails, 

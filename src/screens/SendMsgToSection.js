@@ -12,7 +12,7 @@ import {
   Platform,
   PickerIOS,
   FlatList,
-  
+  ImageBackground,
   ActivityIndicator,
   Text,
   Dimensions,
@@ -33,7 +33,7 @@ import {Colors} from '../components/colors'
 import TimeAgo from 'react-native-timeago';
 import * as Animatable from 'react-native-animatable';
 import HeaderAdmin from '../components/headerAdmin';
-
+import MsgCard from '../components/msgCards'
 
 const SendMsgToSection = (props) => {    
     const { width, height } = Dimensions.get('window');
@@ -43,6 +43,7 @@ const SendMsgToSection = (props) => {
     const [selectedUser, setSelectedUsers] = useState(null)
     const globalState = useContext(CounterContext);
     const [showMsg, changeShowMsg] = useState(false);
+    const [userClicked, setUserClicked] = useState(false)
     const [isLoading, setLoading] = useState(true);
     const [currentPage, changeCurrentPage] = useState(null);
     const [lastPage, changeLastPage] = useState(null);
@@ -51,12 +52,14 @@ const SendMsgToSection = (props) => {
     const [subject, changeSubject] = useState(null);
     const [singleSection, setSection] = useState(null)
 
- 
+    const {state, dispatch } = globalState;
+   
+
 //userToken
 const fetchFeeds = () => {
     const {state, dispatch } = globalState;
     console.log("this is the state", state) 
-    viewAllMessages(state.userDetails.user_token).then((data) => {
+    viewAllMessages(state.user.token).then((data) => {
         if(data.success==true){
             console.log("datas gotten from api", data)
            
@@ -76,9 +79,8 @@ const fetchFeeds = () => {
 
 const fetchSections = () => {
     setLoading(true)
-    const {state, dispatch } = globalState;
     console.log("this is the state", state) 
-    getAllSections(state.userDetails.user_token).then((data) => {
+    getAllSections(state.user.token).then((data) => {
         console.log("the DAATA",data)
         if(data.success==true){
             changeAllSection(data.sections)
@@ -93,7 +95,7 @@ useEffect(() => {
 
 
 const submitMessage = () =>{
-    const {state, dispatch } = globalState;
+   
     setLoading(true)
     if(subject.length<=10){
         showToastWithGravity("Subject must be atleast 10 characters")
@@ -109,8 +111,9 @@ const submitMessage = () =>{
         formData.append('section', singleSection);
         formData.append('message', content);
         formData.append('subject', subject)
-        sendMsgToSection(formData, state.userDetails.user_token).then((data) => {
-            console.log(data)
+        console.log("the sectionssss", state.user.token)
+        sendMsgToSection(formData, state.user.token).then((data) => {
+            console.log(data, "response")
             if(data.success==true){
                 showToastWithGravity(data.message)
                 let rawData = 
@@ -120,7 +123,7 @@ const submitMessage = () =>{
                   topic: singleSection
                   
                 }
-                sendMsgToSection(JSON.stringify(rawData)).then((data)=>{
+                sendMsgToTopic(JSON.stringify(rawData)).then((data)=>{
                   console.log("frm firebase",data)
                 })
                 changeShowMsg(false)
@@ -148,7 +151,7 @@ const showToastWithGravity = (msg) => {
       ToastAndroid.CENTER
     );
   };
- 
+  const firstName = state.user.user.firstName
   if (isLoading) {
     return (
       <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -188,8 +191,7 @@ const showToastWithGravity = (msg) => {
                         />
                         
                     </View>
-                    <Text style={[{marginTop:20, marginLeft:10, textAlign:'left', color:'white',fontFamily:'Candara'}]}>Select Recipient</Text>
-                  
+                    
     <AdvertiseButton title="Submit" handleSubmit={()=>submitMessage()}/>
       <AdvertiseButton title="Close" handleSubmit={()=>changeShowMsg(false)}/>
  
@@ -201,20 +203,22 @@ const showToastWithGravity = (msg) => {
    <Text style={{marginHorizontal:15,fontSize:20, fontFamily:'Candara', alignSelf:'center',textAlign:'center' }}>All Sections, Select a Section you want to send message To</Text>
    <ScrollView>
        {allSections.map((section, index) => (
-  <TouchableOpacity onPress={()=>displayMsgBox(section.ref_name)}>
-  <View style={{height:110, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
-           borderRadius:20 }}>
-       <View style={{flex:2, alignSelf:'center'}}>
-           <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
-           {section.name}
-           </Text>
+//   <TouchableOpacity onPress={()=>displayMsgBox(section.ref_name)}>
+//   <View style={{height:110, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
+//            borderRadius:20 }}>
+//        <View style={{flex:2, alignSelf:'center'}}>
+//            <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
+//            {section.name}
+//            </Text>
            
-       </View>
-       <View style={{flex:1, alignSelf:'center'}}>
-       <MaterialCommunityIcons name="account-group" size={60} color="white" />
-       </View>
-   </View>
-   </TouchableOpacity>
+//        </View>
+//        <View style={{flex:1, alignSelf:'center'}}>
+//        <MaterialCommunityIcons name="account-group" size={60} color="white" />
+//        </View>
+//    </View>
+//    </TouchableOpacity>
+<MsgCard onPress={()=>displayMsgBox(section.ref_name)} 
+iconName="user-friends" title={section.name}/>
        ))}
  
 
@@ -237,7 +241,11 @@ const styles = StyleSheet.create({
         backgroundColor:'green',
         width:'42%',
     },
-    
+    image: {
+        height:'100%',
+         resizeMode: "cover",
+       
+       },
     text: {
         fontFamily: "Candara",
         color: "#3e3e3e",

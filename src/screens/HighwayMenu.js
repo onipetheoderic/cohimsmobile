@@ -40,8 +40,6 @@ const HighwayMenu = (props) => {
     
     const {state, dispatch } = globalState;
 
-    console.log("iniitti", state)
-
     const logOut = () => {
       const {state, dispatch } = globalState;
       let store = async () => await AsyncStorage.removeItem('@SessionObj')
@@ -106,14 +104,7 @@ const HighwayMenu = (props) => {
           else {
               return ;
           }
-          // allAssignedContracts(state.userDetails.user_token)
-          // .then((data) => {
-          //   console.log("lllllllllllllllllllll", data)
-          //   setRoad(data.road);
-          //   setBridge(data.bridge);
-          //   setHousing(data.housing);
-            
-          // })
+         
         })
         
       
@@ -289,10 +280,7 @@ console.log(roadExist, bridgeExist, housingExist)
               })}>
             <View style={[styles.eachCard]}>
             <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
-              {/* 
-              <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-              <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-              <Text style={styles.state}>{contract.contractor}</Text>            */}
+             
               <View style={{alignSelf:'center'}}>
               <ProgressCircle
             percent={contract.current_percentage}

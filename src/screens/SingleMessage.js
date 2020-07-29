@@ -19,7 +19,7 @@ export default function SingleMessageScreen(props) {
     const fetchSingleMsg = () => {
         const {state, dispatch } = globalState;
         let id = props.navigation.getParam('id', null)
-        viewSingleMessage(id, state.userDetails.user_token).then((single_msg)=>{
+        viewSingleMessage(id, state.user.token).then((single_msg)=>{
             console.log("GGGGGGGGG", single_msg)
            
             if(single_msg.success==true){
