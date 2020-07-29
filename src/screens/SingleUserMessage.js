@@ -244,23 +244,10 @@ if (isLoading) {
        }
 
       </View>
+      {isUserSelected &&
       <MsgCard
                  iconName="user-check" title={ `${userSelectedFullname} (${sectionUser()})`}/>
-    {/* {isUserSelected &&
-    <View style={{height:80, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
-            borderRadius:20 }}>
-                
-        <View style={{flex:2, alignSelf:'center'}}>
-            <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
-            {userSelectedFullname}, 
-            ({underscoreFormatter(userSection)})
-            </Text>
-        </View>
-        <View style={{flex:1, alignSelf:'center'}}>
-            <FontAwesome5 name="user-check" size={40} color="white" />
-        </View>
-    </View>
-      } */}
+      }
       {isUserSelected &&
     <View style={{marginLeft:20}}>
         <Text style={[{marginTop:20, fontWeight:'bold', fontFamily:'Candara', fontSize:15, color:'black'}]}>

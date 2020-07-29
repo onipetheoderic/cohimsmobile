@@ -161,7 +161,7 @@ const showToastWithGravity = (msg) => {
   }  
   return (
 
-    <>
+    <View style={{flex:1}}>
            {showMsg &&
       <Animatable.View duration={3000} animation="zoomInDown" style={{justifyContent:'center', borderRadius:10, position:'absolute', zIndex:1000, top:50, left:'10%', width:'80%', height:320, backgroundColor:'#07411D'}}>
            
@@ -199,33 +199,63 @@ const showToastWithGravity = (msg) => {
       
 </Animatable.View>
     }
-   <HeaderAdmin title="Contract Administrative Portal" navigation={props.navigation}/>
-   <Text style={{marginHorizontal:15,fontSize:20, fontFamily:'Candara', alignSelf:'center',textAlign:'center' }}>All Sections, Select a Section you want to send message To</Text>
-   <ScrollView>
+     <View style={{backgroundColor:'green', flex: 2}}>
+    <ImageBackground
+        style={styles.image}
+        source={require('../../assets/images/unnamed.jpg')}
+    >
+    <View style={{marginTop:26, marginRight:10, alignItems:'flex-end'}}>
+      <TouchableOpacity onPress={()=>setUserClicked(!userClicked)}>
+      <FontAwesome5 name="user" size={20} color="white" />
+      </TouchableOpacity>
+    {userClicked &&
+      <View style={{borderRadius:7, backgroundColor:'white', position:'absolute', top:25, width:60, height:30, justifyContent:'center'}}>
+        <TouchableOpacity onPress={()=>logOut()}>
+          <Text style={{color:'black', fontFamily:'Candara', textAlign:'center'}}>Logout</Text>
+        </TouchableOpacity>       
+      </View>
+      }
+    </View>
+      <Text style={{
+        marginTop:20,
+        color:'white',
+        fontWeight:'bold', 
+        fontSize:22,
+        marginLeft:40}}>Hello! {firstName}</Text>
+        <Text style={{fontSize:15,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+       What Can I do Here?
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        Click/Press on the Section Card
+        </Text>
+        <Text style={{fontSize:12,marginTop:10, marginLeft:40, color:'white', fontFamily:'Candara'}}>
+        Fill In the Message Box and submit
+        </Text>
+     
+        <ScrollView horizontal 
+        showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>
+      
+       
+
+        </ScrollView>
+    </ImageBackground>
+</View>
+<View style={{flex:3,backgroundColor:'white',
+    borderTopRightRadius:40, 
+    marginTop:-30,
+    borderTopLeftRadius:40,}}>
+   <ScrollView style={{marginTop:30, marginBottom:10,}}>
        {allSections.map((section, index) => (
-//   <TouchableOpacity onPress={()=>displayMsgBox(section.ref_name)}>
-//   <View style={{height:110, justifyContent:'space-between', flexDirection:'row', marginHorizontal:15,marginTop:30, backgroundColor:'#30A906', 
-//            borderRadius:20 }}>
-//        <View style={{flex:2, alignSelf:'center'}}>
-//            <Text style={{fontSize:20, fontFamily:'Candara', alignSelf:'center', marginLeft:10, textAlign:'center', marginRight:20}}>
-//            {section.name}
-//            </Text>
-           
-//        </View>
-//        <View style={{flex:1, alignSelf:'center'}}>
-//        <MaterialCommunityIcons name="account-group" size={60} color="white" />
-//        </View>
-//    </View>
-//    </TouchableOpacity>
+
 <MsgCard onPress={()=>displayMsgBox(section.ref_name)} 
 iconName="user-friends" title={section.name}/>
        ))}
  
 
     </ScrollView>
-    
+    </View>
       
-  </>
+  </View>
   );
 };
 
