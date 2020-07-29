@@ -147,6 +147,67 @@ export async function datasheetRoadBridgePost(formData, userToken) {
         console.warn(e.message)
     }
 }
+//show_all_zones_page
+//show_all_highway_in_state
+//show_all_highway_in_state_single
+export async function showHighwaySingleState(userToken,type) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}show_all_highway_in_state_single/${type}`, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("api", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function showHighwayAllZones(userToken,type) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}show_all_highway_in_state/${type}`, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("api", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
+export async function showAllZones(userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}show_all_zones_page`, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("api", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
 
 //send_msg_to_sections, get_all_sections broadcast_msg_to_all_users
 

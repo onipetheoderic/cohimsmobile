@@ -24,7 +24,9 @@ import DatasheetTemplate from './src/screens/DatasheetTemplate';
 import BridgeDatasheet from './src/screens/BridgeDatasheet';
 import DatasheetEdit from './src/screens/DatasheetEdit';
 import HdmiVerification from './src/screens/HdmiVerification';
-
+import ShowAllZones from './src/screens/ShowAllZones';
+import ShowEngineersState from './src/screens/ShowEngineersState';
+import ShowEngineersStateSingle from './src/screens/ShowEngineersStateSingle';
 
 const AppNavigator = createStackNavigator(
   {
@@ -50,6 +52,9 @@ const AppNavigator = createStackNavigator(
     BridgeDatasheet:BridgeDatasheet,
     DatasheetEdit:DatasheetEdit,
     HdmiVerification:HdmiVerification,
+    ShowAllZones:ShowAllZones,
+    ShowEngineersState:ShowEngineersState,
+    ShowEngineersStateSingle:ShowEngineersStateSingle
   },{
     headerMode: 'none'
   }

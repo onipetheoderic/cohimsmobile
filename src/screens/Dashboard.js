@@ -27,7 +27,8 @@ import HighwayCircleCard from '../components/highwayCircleCard'
 import { CounterContext } from "../../store";
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
-import ProgressCircle from 'react-native-progress-circle'
+import ProgressCircle from 'react-native-progress-circle';
+
 
 const data = [
   { state: "o", earnings: 0 },
@@ -235,7 +236,7 @@ if (isLoading) {
       
          <HighwayCircleCard iconName="envelope" title="Send/Broadcast Messages" navigation={props.navigation} link="AdminMessage"/>
          {/* <HighwayCircleCard iconName="file-contract" title="View All Contracts" navigation={props.navigation} link="AllContracts"/> */}
-         <HighwayCircleCard iconName="user" title="Show All Engineers" navigation={props.navigation} link="Show All Engineers"/>
+         <HighwayCircleCard iconName="user" title="Show All Engineers" navigation={props.navigation} link="ShowAllZones"/>
      
 
         </ScrollView>
