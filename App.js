@@ -27,6 +27,7 @@ import HdmiVerification from './src/screens/HdmiVerification';
 import ShowAllZones from './src/screens/ShowAllZones';
 import ShowEngineersState from './src/screens/ShowEngineersState';
 import ShowEngineersStateSingle from './src/screens/ShowEngineersStateSingle';
+import SingleUser from './src/screens/SingleUser';
 
 const AppNavigator = createStackNavigator(
   {
@@ -54,7 +55,8 @@ const AppNavigator = createStackNavigator(
     HdmiVerification:HdmiVerification,
     ShowAllZones:ShowAllZones,
     ShowEngineersState:ShowEngineersState,
-    ShowEngineersStateSingle:ShowEngineersStateSingle
+    ShowEngineersStateSingle:ShowEngineersStateSingle,
+    SingleUser:SingleUser
   },{
     headerMode: 'none'
   }

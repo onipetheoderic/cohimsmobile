@@ -150,6 +150,25 @@ export async function datasheetRoadBridgePost(formData, userToken) {
 //show_all_zones_page
 //show_all_highway_in_state
 //show_all_highway_in_state_single
+//engineer_profile_page
+export async function engineerProfileDetails(userToken, id) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}engineer_profile_page/${id}`, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("api", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
 export async function showHighwaySingleState(userToken,type) {   
     
     try {

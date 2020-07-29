@@ -22,23 +22,23 @@ import SignInButton from '../components/signInButton';
 import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'  
 import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 import {Foods} from '../api/foods';
-import {viewAllContracts,showAllZones, showHighwaySingleState, getUserDetail, doSearchContract} from '../api/apiService';
+import {engineerProfileDetails, showHighwaySingleState, getUserDetail, doSearchContract} from '../api/apiService';
 import HeaderAdmin from '../components/headerAdmin';
 import HighwayCircleCard from '../components/highwayCircleCard'
 import { CounterContext } from "../../store";
 import Truncator from "../helpers/truncator";
 import DisplayName from '../helpers/displayName';
 import DisplayPhone from '../helpers/displayPhone';
-import DisplayId from '../helpers/displayId';
 import Currency from '../helpers/currency';
 import ProgressCircle from 'react-native-progress-circle'
 import StateCard from '../components/zoneCard';
 import UserCard from '../components/userCard';
-//// count, littleDesc, title
+import Accordion from '../components/accordion';
+
 const screenWidth = Dimensions.get("window").width;
 
 
-const ShowEngineersStateSingle = (props) => {
+const SingleUser = (props) => {
   const [states, setStates] = useState([]);
 
   const [userClicked, setUserClicked] = useState(false)
@@ -76,22 +76,21 @@ const _default = (str) => {
 
 
 useEffect(() => {
-    let type = props.navigation.getParam('type', null);
- console.log("the types",type )
- showHighwaySingleState(state.user.token, type).then((data)=>{
-    console.log("the users data", data)
-    if(data.success==true){
-        setStates(data.states)
-        setLoading(false)
-       
-
-    }
-    else {
-        setLoading(false)
-        showToastWithGravity("Error getting zones")
-    }
-})
-
+    let id = props.navigation.getParam('id', null);
+    console.log("the types",id )
+    engineerProfileDetails(state.user.token, id).then((data)=>{
+       console.log("SingleVVVVV", data)
+       if(data.success==true){
+           setStates(data.states)
+           setLoading(false)
+          
+   
+       }
+       else {
+           setLoading(false)
+           showToastWithGravity("Error getting zones")
+       }
+   })
 }, []);
 
 const showToastWithGravity = (msg) => {
@@ -134,68 +133,50 @@ if (isLoading) {
 }  
   return (
 <View style={{flex:1}}>
-<View style={{backgroundColor:'green', flex: 2}}>
+<View style={{backgroundColor:'green', flex: 2, borderBottomWidth:4, borderBottomColor:'green'}}>
     <ImageBackground
         style={styles.image}
-        source={require('../../assets/images/unnamed2.jpg')}
+        source={require('../../assets/images/avatarbg4.jpg')}
     >
-    <View style={{marginTop:26, marginRight:10, alignItems:'flex-end'}}>
-      <TouchableOpacity onPress={()=>setUserClicked(!userClicked)}>
-      <FontAwesome5 name="user" size={20} color="white" />
-      </TouchableOpacity>
-    {userClicked &&
-      <View style={{borderRadius:7, backgroundColor:'white', position:'absolute', top:25, width:60, height:30, justifyContent:'center'}}>
-        <TouchableOpacity onPress={()=>logOut()}>
-          <Text style={{color:'black', fontFamily:'Candara', textAlign:'center'}}>Logout</Text>
-        </TouchableOpacity>       
-      </View>
-      }
-    </View>
-      <Text style={{
-        marginTop:20,
-        color:'white',
-        fontWeight:'bold', 
-        fontSize:22,
-        marginLeft:40}}>Hello! {state.user.user.firstName}</Text>
-        <Text style={{fontSize:12,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
-     List of Engineers Across The Six Zones of Nigeria
-        </Text>
+    
+       
         <ScrollView horizontal 
         showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>
-      
-         <HighwayCircleCard iconName="envelope" title="Send/Broadcast Messages" navigation={props.navigation} link="AdminMessage"/>
-         {/* <HighwayCircleCard iconName="file-contract" title="View All Contracts" navigation={props.navigation} link="AllContracts"/> */}
-         <HighwayCircleCard iconName="user" title="Show All Engineers" navigation={props.navigation} link="ShowAllZones"/>
-     
+           
 
         </ScrollView>
     </ImageBackground>
-</View> 
-<View style={{flex:2.6,backgroundColor:'white',
-    borderTopRightRadius:40, 
-    marginTop:-30}}>
-    
-    <ScrollView style={{marginTop:30}}>
-    
-  
-            {states.map((state, index)=>(
-                //   <StateCard navigation={props.navigation} title={state.projectTitle} count={`${Math.round(state.currentPercentage)}%`} type={state.state_name} littleDesc={DisplayName(state.user_assigned)} />
-                <UserCard navigation={props.navigation} 
-                title={state.projectTitle} 
-                count={`${Math.round(state.currentPercentage)}%`}
-                 type={state.state_name} name={DisplayName(state.user_assigned)}
-                 phoneNumber={DisplayPhone(state.user_assigned)}
-                 id={DisplayId(state.user_assigned)} />
-            ))}
-       
+    </View>
+    <View style={{flex:5}}>
+    <Image source={require('../../assets/images/avatar.png')} style={styles.avatar}/>
+        <ScrollView>
+            <Text style={{fontSize:16,alignSelf:'center',color:'black', fontFamily:'Candara'}}>
+                Theoderic Onipe
+                </Text>
+            <Text style={{fontSize:13,alignSelf:'center',color:'#758177', fontFamily:'Candara'}}>
+        Works Sector Nigeria
+            </Text>
+            <Accordion />
+            <Accordion />
     </ScrollView>
-      </View>
 
-      </View>
+    </View>
+
+</View>
   );
 };
 
 const styles = StyleSheet.create({
+avatar: {
+    width:120,
+    alignSelf:'center',
+    marginTop:-60,
+    height:120,
+    borderRadius:60,
+    borderColor:'green',
+    borderWidth:4, 
+    backgroundColor:'white'
+},
   eachCard: {
     margin:10,
     backgroundColor:'white', 
@@ -283,4 +264,4 @@ elevation: 8,
 
 
 
-export default ShowEngineersStateSingle;
+export default SingleUser;
