@@ -18,8 +18,8 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { TextInput } from 'react-native-gesture-handler';
 import {Colors} from '../components/colors'
 import SignInButton from '../components/signInButton';
-import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'  
-import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
+ 
+
 import {Foods} from '../api/foods';
 import {viewAllContracts,  getUserDetail, doSearchContract} from '../api/apiService';
 import HeaderAdmin from '../components/headerAdmin';
@@ -28,45 +28,10 @@ import { CounterContext } from "../../store";
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
 import ProgressCircle from 'react-native-progress-circle';
+import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts' 
+import {VictoryLabel, VictoryAxis, VictoryStack, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 
 
-const data = [
-  { state: "o", earnings: 0 },
-  { state: "theo", earnings: 13000 },
-  { state: "abia", earnings: 16500 },
-  { state: "adamawa", earnings: 14250 },
-  { state: "Akwa", earnings: 19000 },
-  { state: "Anam", earnings: 13000 },
-  { state: "Bauchi", earnings: 16500 },
-  { state: "Benue", earnings: 14250 },
-  { state: "Borno", earnings: 19000 },
-  { state: "theo", earnings: 13000 },
-  { state: "abia", earnings: 16500 },
-  { state: "adamawa", earnings: 14250 },
-  { state: "Akwa", earnings: 19000 },
-  { state: "Anam", earnings: 13000 },
-  { state: "Bauchi", earnings: 16500 },
-  { state: "Benue", earnings: 14250 },
-  { state: "Borno", earnings: 19000 },
-  { state: "Borno", earnings: 19000 },
-  { state: "theo", earnings: 13000 },
-  { state: "abia", earnings: 16500 },
-  { state: "casf", earnings: 14250 },
-  { state: "fAkwa", earnings: 19000 },
-  { state: "Anfam", earnings: 13000 },
-  { state: "Bafuchi", earnings: 16500 },
-  { state: "Benfue", earnings: 14250 },
-  { state: "Borfno", earnings: 19000 },
-  { state: "theso", earnings: 13000 },
-  { state: "abisa", earnings: 16500 },
-  { state: "adas", earnings: 14250 },
-  { state: "Akswa", earnings: 19000 },
-  { state: "Anasm", earnings: 13000 },
-  { state: "Bauschi", earnings: 16500 },
-  { state: "Besnue", earnings: 14250 },
-  { state: "Bsorno", earnings: 19000 }
-
-];
 const screenWidth = Dimensions.get("window").width;
 
 
@@ -196,6 +161,7 @@ const isSpuPresent = spu.length > 0 ? true : false
 const isHousingPresent = housing.length > 0 ? true : false;
 const isHdmiPresent = hdmi.length > 0 ? true : false;
 
+
 if (isLoading) {
   return (
     <View style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -249,8 +215,40 @@ if (isLoading) {
     
     <ScrollView style={{marginTop:30}}>
        
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>          
-        <VictoryChart domainPadding={0} width={1050} height={300}
+      <ScrollView style={{marginTop:-50}} horizontal showsHorizontalScrollIndicator={false}>
+     
+      <VictoryChart
+         
+          height={400}
+          width={400}
+          domainPadding={{ x: 30, y: 10 }}
+          minDomain={{ y: 0 }}
+         maxDomain={{y:60}}
+          >
+<VictoryStack
+  colorScale={["#03260A", "#C4D914", "#69F409"]}
+>
+  <VictoryBar
+    data={[{x: "a", y: 12}, {x: "b", y: 3}, {x: "c", y: 5}, {x: "d", y: 15}]}
+  />
+  <VictoryBar
+    data={[{x: "a", y: 1}, {x: "b", y: 4}, {x: "c", y: 5}, {x: "d", y: 15}]}
+  />
+  <VictoryBar
+    data={[{x: "a", y: 3}, {x: "b", y: 2}, {x: "c", y: 6}, {x: "d", y: 15}]}
+  />
+</VictoryStack>    
+<VictoryAxis 
+tickFormat={["cash", "rules", "deric", "onipe"]} 
+style={{
+  axis: {stroke: "white"},
+  axisLabel: {fontSize: 20, padding: 30},
+  tickLabels: {fontSize: 10, fontFamily:'Candara', padding: 5}
+}}
+/>
+</VictoryChart>
+
+        {/* <VictoryChart domainPadding={0} width={1050} height={300}
         theme={VictoryTheme.material}>
           <VictoryBar
             cornerRadius={10}
@@ -259,7 +257,7 @@ if (isLoading) {
           data={data} x="state" y="earnings" 
           style={{ data: { fill: Colors.mainGreen,
           stroke: Colors.primaryGreen,strokeWidth: 1 }}}/>
-        </VictoryChart>
+        </VictoryChart> */}
       </ScrollView>
       <View style={{marginVertical:30}}>
         <View style={styles.textField}>
@@ -280,7 +278,7 @@ if (isLoading) {
           title: data.projectTitle,
           type_of_project: data.contractType
         })}>
-            <View style={{borderBottomWidth:1,height:30,
+            <View style={{borderBottomWidth:1,height:70,
               justifyContent:'center',
               marginLeft:'auto', marginRight:'auto',width:'80%',
             borderBottomColor:'rgb(202, 207, 210)'}}>
