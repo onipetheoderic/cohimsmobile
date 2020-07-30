@@ -32,20 +32,23 @@ import DisplayPhone from '../helpers/displayPhone';
 import Currency from '../helpers/currency';
 import ProgressCircle from 'react-native-progress-circle'
 import StateCard from '../components/zoneCard';
-import UserCard from '../components/userCard';
+import ContractCard from '../components/contractCard';
 import Accordion from '../components/accordion';
 
 const screenWidth = Dimensions.get("window").width;
 
 
 const SingleUser = (props) => {
-  const [states, setStates] = useState([]);
+    const [states, setStates] = useState([]);
 
-  const [userClicked, setUserClicked] = useState(false)
-  const [searchValue, setSearchValue] = useState("");
-  const [contracts, setContracts] = useState([]);
-  const [user, setUser] = useState({});
-  const [isLoading, setLoading] = useState(true)
+    const [userClicked, setUserClicked] = useState(false)
+    const [searchValue, setSearchValue] = useState("");
+    const [contracts, setContracts] = useState([]);
+    const [user, setUser] = useState({});
+    const [user_summary, setUserSummary] = useState({})
+    const [contract_summary, setContractSummary] = useState({})
+    const [contracts_all, setContractAll] = useState([])
+    const [isLoading, setLoading] = useState(true)
     const { width, height } = Dimensions.get('window');
     const globalState = useContext(CounterContext); 
     const {state, dispatch } = globalState;
@@ -74,6 +77,17 @@ const _default = (str) => {
     
 }
 
+/*
+ user, 
+contracts:contracts, 
+contract_summary:contract_summary
+
+ contract_count: contracts.length,
+contract_videos_count: contract_videos.length,
+contract_images_count: contract_images.length,
+workers_count: user_workers.length
+*/ 
+//contract_count, contract_videos_count, contract_images_count, workers_count
 
 useEffect(() => {
     let id = props.navigation.getParam('id', null);
@@ -81,10 +95,11 @@ useEffect(() => {
     engineerProfileDetails(state.user.token, id).then((data)=>{
        console.log("SingleVVVVV", data)
        if(data.success==true){
-           setStates(data.states)
-           setLoading(false)
-          
-   
+           
+        setUserSummary(data.user);
+        setContractSummary(data.contract_summary);
+        setContractAll(data.contracts)
+        setLoading(false)
        }
        else {
            setLoading(false)
@@ -122,7 +137,34 @@ const logOut = () => {
 }
 
 
+const {
+    contract_count, 
+    contract_videos_count, 
+    contract_images_count, 
+    workers_count } = contract_summary;
 
+
+const arrayfiedContractSummary = [
+    {question: "Number of Contracts Inspecting", answer: contract_count},
+    {question: "Number of Videos Uploaded", answer: contract_videos_count},
+    {question: "Number of Images Uploaded", answer: contract_images_count},
+    {question: "Number of Employees Under Engineer", answer: workers_count}
+]
+
+//"email": "f.alawal@cohims.com", "firstName": "F.A LAWAL", 
+//"phoneNumber": "0", "position": "7", "role": 7, "section
+const {
+    email,
+    firstName,
+    phoneNumber,
+    section
+} = user_summary;
+const arrayfiedUserSummary = [
+    {question: "email", answer: email},
+    {question: "Name", answer: firstName},
+    {question: "Phone Number", answer: phoneNumber},
+    {question: "Section", answer: section}
+]
 
 if (isLoading) {
   return (
@@ -151,13 +193,42 @@ if (isLoading) {
     <Image source={require('../../assets/images/avatar.png')} style={styles.avatar}/>
         <ScrollView>
             <Text style={{fontSize:16,alignSelf:'center',color:'black', fontFamily:'Candara'}}>
-                Theoderic Onipe
+               {user_summary.firstName}
                 </Text>
             <Text style={{fontSize:13,alignSelf:'center',color:'#758177', fontFamily:'Candara'}}>
-        Works Sector Nigeria
+                {user_summary.section} Sector Nigeria
             </Text>
-            <Accordion />
-            <Accordion />
+            <Accordion 
+            questions={arrayfiedUserSummary}
+            title="User Summary"
+            description="Quick Summary of User Details"
+            />
+
+            <Accordion 
+            questions={arrayfiedContractSummary} 
+            title="Contract Summary" 
+            description="Quick Summary of the Users Contracts Activities"
+            />
+             <Text style={{fontSize:15, fontWeight:'500', alignSelf:'center',
+             color:'#758177', marginBottom:10,marginTop:20, fontFamily:'Candara'}}>
+                Contracts Assigned to {user_summary.firstName}
+            </Text>
+       
+            {contracts_all.map((state, index)=>(
+              
+                <ContractCard 
+                    title={state.projectTitle} 
+                    count={`${Math.round(state.currentPercentage)}%`}
+                    amount_certified_to_date={state.amountCertifiedToDate}
+                    contract_sum={state.contractSum}
+                    type={state.state}
+                    zone={state.zone}
+                    date_awarded={state.dateAwarded}
+                    date_completion={state.dateCompletion}
+                    project_length={state.projectLength}
+                    monthly_operational_cost={state.monthly_operational_cost}
+                 />
+            ))}
     </ScrollView>
 
     </View>
