@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { CounterContext } from "../../store";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { NavigationActions, StackActions } from 'react-navigation'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import {datasheetkey} from '../api/constants';

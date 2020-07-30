@@ -18,6 +18,7 @@ import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-community/async-storage'
 import { TextInput } from 'react-native-gesture-handler';
 import {Colors} from '../components/colors'
+import { NavigationActions, StackActions } from 'react-navigation'
 import SignInButton from '../components/signInButton';
 import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'  
 import {VictoryLabel, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";

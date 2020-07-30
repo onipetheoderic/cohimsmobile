@@ -151,6 +151,27 @@ export async function datasheetRoadBridgePost(formData, userToken) {
 //show_all_highway_in_state
 //show_all_highway_in_state_single
 //engineer_profile_page
+//all_contract_performance_works_states
+
+export async function allContractPerformanceWorksState(userToken) {   
+    
+    try {
+        let feeds = await fetch(`${baseUrl}all_contract_performance_works_states`, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
 export async function engineerProfileDetails(userToken, id) {   
     
     try {
@@ -162,7 +183,7 @@ export async function engineerProfileDetails(userToken, id) {
             }
         });
         let result = await feeds.json();
-        console.log("api", result)
+        
         feeds = null;
         return result;
     } catch (e) {
@@ -180,7 +201,7 @@ export async function showHighwaySingleState(userToken,type) {
             }
         });
         let result = await feeds.json();
-        console.log("api", result)
+        
         feeds = null;
         return result;
     } catch (e) {
@@ -200,7 +221,7 @@ export async function showHighwayAllZones(userToken,type) {
             }
         });
         let result = await feeds.json();
-        console.log("api", result)
+        
         feeds = null;
         return result;
     } catch (e) {
@@ -220,7 +241,7 @@ export async function showAllZones(userToken) {
             }
         });
         let result = await feeds.json();
-        console.log("api", result)
+        
         feeds = null;
         return result;
     } catch (e) {

@@ -18,10 +18,10 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { TextInput } from 'react-native-gesture-handler';
 import {Colors} from '../components/colors'
 import SignInButton from '../components/signInButton';
- 
+import { NavigationActions, StackActions } from 'react-navigation'
 
 import {Foods} from '../api/foods';
-import {viewAllContracts,  getUserDetail, doSearchContract} from '../api/apiService';
+import {viewAllContracts, allContractPerformanceWorksState, getUserDetail, doSearchContract} from '../api/apiService';
 import HeaderAdmin from '../components/headerAdmin';
 import HighwayCircleCard from '../components/highwayCircleCard'
 import { CounterContext } from "../../store";
@@ -45,6 +45,8 @@ const DashboardScreen = (props) => {
   const [searchValue, setSearchValue] = useState("");
   const [contracts, setContracts] = useState([]);
   const [user, setUser] = useState({});
+  const [allWorksContract, setAllWorksContracts] = useState([]);
+  const [allStates, setAllStates] = useState([]);
   const [isLoading, setLoading] = useState(true)
     const { width, height } = Dimensions.get('window');
     const globalState = useContext(CounterContext); 
@@ -87,17 +89,28 @@ useEffect(() => {
             if(parsifiedResult!=null){
               let userDetails = parsifiedResult.userDetails;
               let { user_token } = userDetails;
-              console.log(user_token)
+              // console.log(user_token)
               getUserDetail(user_token)
               .then((data) => {
-              console.log("userfffffl", data)
+              // console.log("userfffffl", data)
             
               setUser(data.user);
               dispatch({ type: 'newUser',payload:{user:data.user, token:user_token}})
+              
+              allContractPerformanceWorksState(user_token)
+              .then((all_contracts) => {
+                // console.log("XXXXXXXXX", all_contracts)
+                  // if(all_contracts.success==true){
+                  //   console.log("all_contracts graph", all_contracts)
+                  setAllWorksContracts(all_contracts.overalls)
+                  setAllStates(all_contracts.states)
+                  // }                 
+              })
+             
               setContracts([])
               viewAllContracts(user_token).then((data) => {
                 
-                console.log("all Datas", data)
+                // console.log("all Datas", data)
                 let housingData = data.housing;
                 let worksData = data.works;
                 let spuData = data.spu == undefined ? [] : data.spu
@@ -109,8 +122,7 @@ useEffect(() => {
                 setSpu(spuData);
                 setLoading(false)
               })
-            
-            })
+          })
           }
         })
 
@@ -160,7 +172,20 @@ const isWorksPresent = works.length > 0 ? true : false
 const isSpuPresent = spu.length > 0 ? true : false
 const isHousingPresent = housing.length > 0 ? true : false;
 const isHdmiPresent = hdmi.length > 0 ? true : false;
+//allNewlyAwardedVals, allOngoingVals, allCompletedVals
+const isAllWorksContractPresent = allWorksContract.length > 0 ? true : false;
 
+let newlyAwarded = allWorksContract[0];
+let ongoingContract = allWorksContract[1];
+let completedContract = allWorksContract[2];
+
+console.log("newly awarded",newlyAwarded)
+
+console.log("ongoing contract", ongoingContract)
+
+console.log("completed", completedContract)
+
+console.log("stat", allStates)
 
 if (isLoading) {
   return (
@@ -214,35 +239,49 @@ if (isLoading) {
     borderTopLeftRadius:40,}}>
     
     <ScrollView style={{marginTop:30}}>
-       
-      <ScrollView style={{marginTop:-50}} horizontal showsHorizontalScrollIndicator={false}>
+    <Text style={{fontFamily:'Candara',fontSize:13,alignSelf:'center', margin:6}}>Works Contract Performance Across Nigeria</Text>
+    <View style={{flexDirection:'row', justifyContent:'space-evenly'}}>
+          <View style={{backgroundColor:"#69F409"}}>
+            <Text style={{fontFamily:'Candara',fontSize:10, margin:6}}>Newly Awarded</Text>
+          </View>
+          <View style={{backgroundColor:"#C4D914"}}>
+            <Text style={{fontFamily:'Candara',fontSize:10, margin:6}}>Ongoing Contract</Text>
+          </View>
+          <View style={{backgroundColor:"#0BB434"}}>
+            <Text style={{fontFamily:'Candara',fontSize:10, margin:6}}>Completed Contract</Text>
+          </View>
+        </View>
+      <ScrollView style={{marginTop:-50, marginLeft:-20}} horizontal showsHorizontalScrollIndicator={false}>
      
       <VictoryChart
          
           height={400}
-          width={400}
-          domainPadding={{ x: 30, y: 10 }}
+          width={1400}
+          domainPadding={{x: 10, y: 10 }}
           minDomain={{ y: 0 }}
-         maxDomain={{y:60}}
+       
           >
-<VictoryStack
-  colorScale={["#03260A", "#C4D914", "#69F409"]}
+{isAllWorksContractPresent &&
+  <VictoryStack
+  colorScale={["#0BB434", "#C4D914", "#69F409"]}
 >
   <VictoryBar
-    data={[{x: "a", y: 12}, {x: "b", y: 3}, {x: "c", y: 5}, {x: "d", y: 15}]}
-  />
+    data={completedContract}
+    />
   <VictoryBar
-    data={[{x: "a", y: 1}, {x: "b", y: 4}, {x: "c", y: 5}, {x: "d", y: 15}]}
+    data={ongoingContract}
   />
-  <VictoryBar
-    data={[{x: "a", y: 3}, {x: "b", y: 2}, {x: "c", y: 6}, {x: "d", y: 15}]}
+  <VictoryBar    
+    data={newlyAwarded}
   />
+  {/* ongoing = #C4D914, completed=#0BB434  newlyAwarded = #69F409*/}
 </VictoryStack>    
+}
 <VictoryAxis 
-tickFormat={["cash", "rules", "deric", "onipe"]} 
+tickFormat={allStates} 
 style={{
   axis: {stroke: "white"},
-  axisLabel: {fontSize: 20, padding: 30},
+  axisLabel: {fontSize: 20, padding: 10},
   tickLabels: {fontSize: 10, fontFamily:'Candara', padding: 5}
 }}
 />
@@ -258,6 +297,7 @@ style={{
           style={{ data: { fill: Colors.mainGreen,
           stroke: Colors.primaryGreen,strokeWidth: 1 }}}/>
         </VictoryChart> */}
+       
       </ScrollView>
       <View style={{marginVertical:30}}>
         <View style={styles.textField}>
@@ -290,7 +330,7 @@ style={{
       </View>
 {isWorksPresent &&
       <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest Works Contracts Across Nigeria</Text>
+      <Text style={{fontFamily:'Candara', fontSize:16}}>Latest Works Contracts Across Nigeria</Text>
       </View>
       }
       <ScrollView horizontal>

@@ -23,7 +23,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import PlayGround from '../components/playGround'
 import HighwayCard from '../components/highwayNav';
 import AsyncStorage from '@react-native-community/async-storage'
-
+import { NavigationActions, StackActions } from 'react-navigation'
 import HighwayCircleCard from '../components/highwayCircleCard'
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';

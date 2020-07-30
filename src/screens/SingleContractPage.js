@@ -13,7 +13,7 @@ import {Contract} from '../api/contract'
 import { getSingleContract, } from '../api/apiService';//accepts id and type
 import {imageUrl} from '../api/constants';
 const screenWidth = Dimensions.get("window").width;
-
+import { NavigationActions, StackActions } from 'react-navigation'
 
 const LoginScreen = (props) => {
     const [singleContract, changeContract] = useState({})
