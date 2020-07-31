@@ -34,6 +34,7 @@ import Currency from '../helpers/currency';
 import ProgressCircle from 'react-native-progress-circle'
 import StateCard from '../components/zoneCard';
 import UserCard from '../components/userCard';
+import { NavigationActions, StackActions } from 'react-navigation'
 //// count, littleDesc, title
 const screenWidth = Dimensions.get("window").width;
 

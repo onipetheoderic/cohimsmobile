@@ -187,20 +187,43 @@ console.log(roadExist, bridgeExist, housingExist)
       <Text style={styles.contractTitle}>Housing Contract Your are Assigned To</Text>
     }
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {housing.map((contract) => (
-             <TouchableOpacity onPress={() => props.navigation.navigate('SelectDatasheet', {
-              id: contract.id,
-              type: "housing",
-              title: contract.title,
-              token:token
-            })}>
+    {housing.map((contract) => (
+              <TouchableOpacity onPress={() => props.navigation.navigate('SelectDatasheet', {
+                id: contract.id,
+                type: "housing",
+                token:token,
+                title: contract.title,
+              })}>
             <View style={[styles.eachCard]}>
-              <Text style={styles.title}>{contract.title}</Text>
-              <Text style={styles.state}>{contract.state} {contract.lga}</Text>
-              <Text style={styles.currentPercentage}>{Math.round(contract.current_percentage)}%</Text>
-              <Text style={styles.state}>{contract.contractor}</Text>           
+            <Text style={styles.title}>{Truncator(contract.title, 45)}</Text>
+             
+              <View style={{alignSelf:'center'}}>
+              <ProgressCircle
+            percent={contract.current_percentage}
+            radius={40}
+            borderWidth={5}
+            color="#086321"
+            shadowColor="#F2F5F3"
+            bgColor="#fff"
+            containerStyle={{shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 9,
+            },
+            shadowOpacity: 0.50,
+            shadowRadius: 12.35,
+            
+            elevation: 19,}}
+        >
+            <Text style={{ fontSize: 18, fontFamily:'Candara' }}>{Math.round(contract.current_percentage)}%</Text>
+        </ProgressCircle>
+        </View>
+        <Text style={styles.state}>{Currency(contract.contract_sum)}</Text>
+        <Text style={styles.state}>{Truncator(contract.contractor, 20)}</Text>
+        <Text style={styles.title}>{contract.state}</Text>
             </View>
             </TouchableOpacity>
+
             
           
           ))}

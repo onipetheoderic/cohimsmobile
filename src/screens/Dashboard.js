@@ -110,7 +110,7 @@ useEffect(() => {
               setContracts([])
               viewAllContracts(user_token).then((data) => {
                 
-                // console.log("all Datas", data)
+                console.log("all spu Datas", data.spu)
                 let housingData = data.housing;
                 let worksData = data.works;
                 let spuData = data.spu == undefined ? [] : data.spu
@@ -179,13 +179,7 @@ let newlyAwarded = allWorksContract[0];
 let ongoingContract = allWorksContract[1];
 let completedContract = allWorksContract[2];
 
-console.log("newly awarded",newlyAwarded)
 
-console.log("ongoing contract", ongoingContract)
-
-console.log("completed", completedContract)
-
-console.log("stat", allStates)
 
 if (isLoading) {
   return (
@@ -329,8 +323,8 @@ style={{
        
       </View>
 {isWorksPresent &&
-      <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:16}}>Latest Works Contracts Across Nigeria</Text>
+      <View style={{marginLeft:10, marginVertical:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:15}}>Latest Works Contracts Across Nigeria</Text>
       </View>
       }
       <ScrollView horizontal>
@@ -374,8 +368,8 @@ style={{
           ))}
         </ScrollView>
 {isHousingPresent &&
-        <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest Housing Contracts Across Nigeria</Text>
+        <View style={{marginLeft:10, marginVertical:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:15}}>Latest Housing Contracts Across Nigeria</Text>
       </View>
       }
       <ScrollView horizontal>
@@ -422,8 +416,8 @@ style={{
 
 
         {isSpuPresent &&
-      <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest SPU Contracts Across Nigeria</Text>
+      <View style={{marginLeft:10, marginVertical:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:15}}>Latest SPU Contracts Across Nigeria</Text>
       </View>
       }
       <ScrollView horizontal>
@@ -468,8 +462,8 @@ style={{
         </ScrollView>
 
         {isHdmiPresent &&
-      <View style={{marginLeft:10}}>
-      <Text style={{fontFamily:'Candara', fontSize:20}}>Latest HDMI Contracts Across Nigeria</Text>
+      <View style={{marginLeft:10, marginVertical:10}}>
+      <Text style={{fontFamily:'Candara', fontSize:15}}>Latest HDMI Contracts Across Nigeria</Text>
       </View>
       }
       <ScrollView horizontal>

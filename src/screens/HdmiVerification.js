@@ -119,6 +119,7 @@ const submitHdmiContent = () => {
         
         
         hdmiVerifyCodePost(formData, token).then((data) => {
+          
           if(data.success==false){
             setLoading(false)
             setHdmiPresent(false)
@@ -140,16 +141,18 @@ const submitHdmiContent = () => {
         
           }
           else {
-           
+            console.log("the data hhh", data)
+            console.log("single chdmi", data.single_hdmi)
+            setSingleHdmi(data.single_hdmi)
             // props.navigation.navigate('HighwayMenu')
             setLoading(false)
             showToastWithGravity(data.message)
             setHdmiPresent(true)
            
             let { success, single_hdmi, ...otherdetails } = data;
-            console.log(otherdetails, "X", single_hdmi)
+            console.log( "UUUUUUX", single_hdmi)
             setOtherDetails(otherdetails)
-            setSingleHdmi(single_hdmi)
+           
           }
         })
     }
@@ -175,7 +178,7 @@ const expirationStatus = (bool) => {
         return "Not Expired"
     }
 }
-
+console.log("YYYYYYYYYYYYYYYY",singleHdmi)
   return (
     <View style={{flex:1}}> 
 
