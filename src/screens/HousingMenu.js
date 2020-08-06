@@ -20,7 +20,7 @@ import HighwayCircleCard from '../components/highwayCircleCard';
 import GetLocation from 'react-native-get-location'
 
 
-const UploadMenu = (props) => {    
+const HousingMenu = (props) => {    
     const { width, height } = Dimensions.get('window');
     const [token, setToken] = useState("");
     const [bridge, setBridge] = useState([]);
@@ -55,10 +55,10 @@ return (
     </View>
       <CarouselPlayGround>
          
-         <Carousel navigation={props.navigation} contractName="Upload Road Contract Datasheet" title="Already Existing Road Beme for you to select from" imageLink = {require('../../assets/images/offline.jpg')} description="If you want a road Beme, click on Road Beme, and Start populating the BEME"/>
-         <Carousel navigation={props.navigation} contractName="Upload Bridge Contract Datasheet" title="Easy to Use Bridge Beme for you to Select from" imageLink = {require('../../assets/images/offline1.jpg')} description="You Need a Bridge Beme, Click on the Bridge Beme and Start populating the Template"/>
-         <Carousel navigation={props.navigation} contractName="Upload Housing Contract Datasheet" title="Already Existing Housing Beme for you to Populate" imageLink = {require('../../assets/images/offline2.jpg')} description="Click on Housing Beme, Select the Type of House, then Start populating"/>
-         <Carousel navigation={props.navigation} contractName="Upload HDMI Contract Datasheet" title="Quickly Populate the HDMI Beme" imageLink = {require('../../assets/images/offline5.jpg')} description="Upload HDMI inspection details by populating the preexisting Beme"/>
+         <Carousel navigation={props.navigation} contractName="One Bedroom Semi-detached Bungalow" title="One Bedroom Bungalow" imageLink = {require('../../assets/images/house.jpg')} description="Upload One Bedroom Semi Detached Burgalow"/>
+         <Carousel navigation={props.navigation} contractName="Two Bedroom Semi-detached Burgalow" title="Two Bedroom Semi-detached" imageLink = {require('../../assets/images/house1.jpg')} description="Upload Two bedroom Semi Detached"/>
+         <Carousel navigation={props.navigation} contractName="Three Bedroom Semi-detached Burgalow" title="Three Bedroom Semi-detached" imageLink = {require('../../assets/images/house2.jpg')} description="Upload Three bedroom Datasheet"/>
+         <Carousel navigation={props.navigation} contractName="Condominium" title="Condominium" imageLink = {require('../../assets/images/house3.jpg')} description="Upload Condominium Datasheet"/>
         
       
       </CarouselPlayGround>
@@ -75,40 +75,69 @@ return (
         <View style={{flexDirection:'row', justifyContent:'space-around'}}>
           
           <View style={[styles.eachCard]}>
-            <TouchableOpacity onPress={()=>props.navigation.navigate('DatasheetTemplate', {
-              type:"road"
+            <TouchableOpacity onPress={()=>props.navigation.navigate('HousingTemplate', {
+              type:"one_bedroom_semi_detached_bungalow"
             })}>
               <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
-              name="road" size={41} color="green"/>
-              <Text style={styles.state}>Road Contract Beme</Text>  
+              name="home" size={41} color="green"/>
+              <Text style={styles.state}>One Bedroom Semi-detached Burgalow</Text>  
             </TouchableOpacity>
           </View>
 
           <View style={[styles.eachCard]}>
-            <TouchableOpacity onPress={()=>props.navigation.navigate('BridgeDatasheet', {
-              type:"bridge"
+            <TouchableOpacity onPress={()=>props.navigation.navigate('HousingTemplate', {
+              type:"two_bedroom_semi_detached_bungalow_type_a"
             })}>
                 <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
-                    name="water" size={41} color="green"/>
-                <Text style={styles.state}>Bridge Contract Beme</Text>   
+                    name="home" size={41} color="green"/>
+                <Text style={styles.state}>Two Bedroom Semi-detached Burgalow Type A</Text>   
             </TouchableOpacity>                     
           </View>
         
-        </View>       
+        </View>     
         <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+          
           <View style={[styles.eachCard]}>
-          <TouchableOpacity onPress={()=>props.navigation.navigate('HousingMenu')}>
+            <TouchableOpacity onPress={()=>props.navigation.navigate('HousingTemplate', {
+              type:"two_bedroom_semi_detached_bungalow_type_b"
+            })}>
               <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
               name="home" size={41} color="green"/>
-              <Text style={styles.state}>Housing Beme</Text>
+              <Text style={styles.state}>Two Bedroom Semi-detached Burgalow Type B</Text>  
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.eachCard]}>
+            <TouchableOpacity onPress={()=>props.navigation.navigate('HousingTemplate', {
+              type:"three_bedroom_semi_detached_bungalow"
+            })}>
+                <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
+                    name="home" size={41} color="green"/>
+                <Text style={styles.state}>Three Bedroom Semi-detached Burgalow</Text>   
+            </TouchableOpacity>                     
+          </View>
+        </View>    
+        <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+          <View style={[styles.eachCard]}>
+          <TouchableOpacity onPress={()=>props.navigation.navigate('HousingTemplate', {
+              type:"three_bedroom_semi_detached_bungalow_laterite_blocks"
+            })}>
+              <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
+              name="home" size={41} color="green"/>
+              <Text style={styles.state}>Three Bedroom Semi-detached Laterite block</Text>  
           </TouchableOpacity>
           </View>
 
           <View style={[styles.eachCard]}>
+            <TouchableOpacity onPress={()=>props.navigation.navigate('HousingTemplate', {
+                type:"condominium"
+              })}>
                 <FontAwesome5 style={{alignSelf:'center', textAlign:'center'}} 
-                    name="broadcast-tower" size={41} color="green"/>
-                <Text style={styles.state}>HDMI Datasheet</Text>                       
+                    name="home" size={41} color="green"/>
+                <Text style={styles.state}>Condominium Datasheet</Text>       
+            </TouchableOpacity>                
           </View>
+
         </View>   
       </ScrollView>
    
@@ -122,7 +151,7 @@ return (
 
 
 
-export default UploadMenu;
+export default HousingMenu;
 
 const styles = StyleSheet.create({
   swipeoutSide: {
@@ -247,6 +276,7 @@ title: {
 },
 state: {
   marginTop:5, 
+  marginHorizontal:3,
   textAlign:'center',
   color:'#095A1F',
   fontFamily:'Candara', 

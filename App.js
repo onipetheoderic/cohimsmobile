@@ -28,6 +28,8 @@ import ShowAllZones from './src/screens/ShowAllZones';
 import ShowEngineersState from './src/screens/ShowEngineersState';
 import ShowEngineersStateSingle from './src/screens/ShowEngineersStateSingle';
 import SingleUser from './src/screens/SingleUser';
+import HousingMenu from './src/screens/HousingMenu';
+import HousingTemplate from './src/screens/HousingTemplate';
 
 const AppNavigator = createStackNavigator(
   {
@@ -56,7 +58,9 @@ const AppNavigator = createStackNavigator(
     ShowAllZones:ShowAllZones,
     ShowEngineersState:ShowEngineersState,
     ShowEngineersStateSingle:ShowEngineersStateSingle,
-    SingleUser:SingleUser
+    SingleUser:SingleUser,
+    HousingMenu:HousingMenu,
+    HousingTemplate:HousingTemplate
   },{
     headerMode: 'none'
   }

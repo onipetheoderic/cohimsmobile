@@ -69,15 +69,7 @@ const HighwayMenu = (props) => {
 
       console.log("this is the state", state)
       let dataSheetArray = async () => await AsyncStorage.getItem(datasheetkey)
-        dataSheetArray().then((val) => {
-          console.log("the val", val)
-          if (val) {
-            let Datasheets = JSON.parse(val)
-            console.log("DDDDD",Datasheets)
-            dispatch({ type: 'addToDatasheetArray',payload:Datasheets})
-            setSavedDatasheet(Datasheets)          
-          }
-        })
+        
         AsyncStorage.getItem("@SessionObj")
         .then((result)=>{          
             let parsifiedResult = JSON.parse(result);
@@ -88,8 +80,23 @@ const HighwayMenu = (props) => {
               getUserDetail(user_token)
               .then((data) => {
               console.log("userfffffl", data)
-            
-              setUser(data.user);
+              if(data.success==true){
+                setUser(data.user);
+                dataSheetArray().then((val) => {
+                  console.log("the val", val)
+                  if (val) {
+                    let Datasheets = JSON.parse(val)
+                    console.log("DDDDD",Datasheets)
+                    dispatch({ type: 'addToDatasheetArray',payload:Datasheets})
+                    setSavedDatasheet(Datasheets)          
+                  }
+                })
+              }
+              else {
+                props.navigation.navigate('LoginScreen')
+              }
+              
+              
             
             })
               allAssignedContracts(user_token)

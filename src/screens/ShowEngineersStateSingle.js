@@ -159,7 +159,7 @@ if (isLoading) {
         fontSize:22,
         marginLeft:40}}>Hello! {state.user.user.firstName}</Text>
         <Text style={{fontSize:12,marginTop:20, marginLeft:40, color:'white', fontFamily:'Candara'}}>
-     List of Engineers Across The Six Zones of Nigeria
+     List of Engineers In a Single State In Nigeria
         </Text>
         <ScrollView horizontal 
         showsHorizontalScrollIndicator={false} style={{flexDirection:'row', marginTop:-40}}>

@@ -28,7 +28,7 @@ import HighwayCircleCard from '../components/highwayCircleCard'
 import Truncator from "../helpers/truncator";
 import Currency from '../helpers/currency';
 import underscoreFormatter from '../helpers/underscoreFormatter';
-import { allAssignedContracts, uploadInspectionDatasheet, datasheetRoadBridgePost } from '../api/apiService';
+import { adatasheetHousingPost, datasheetHousingPost, datasheetRoadBridgePost } from '../api/apiService';
 import {Colors} from '../components/colors'
 import TimeAgo from 'react-native-timeago';
 import Swipeout from 'react-native-swipeout';
@@ -94,15 +94,64 @@ const getDatasheetById = (storageId) => {
   let storageIndex = savedDatasheet.findIndex(x => x.id === storageId)
   let selectedDatasheet = savedDatasheet[storageIndex];
   let { components, date, latitude, longitude, type } = selectedDatasheet;
+  if(type==="housing"){
+    let componentData = components;
+
+    let selectedData = [];
+    for(var i=0; i<componentData.length; i++){
+      if(componentData[i].amount!="" && componentData[i].qty!="" && componentData[i].unit!=""){
+        selectedData.push(componentData[i])
+      
+      }    
+    }
+    console.log("na housing tins,", latitude, longitude, type, date)
+    let formData = new FormData();
+    formData.append('date', date);
+    formData.append('latitude', latitude);
+    formData.append('longitude', longitude);
+    formData.append('type', type);
+    formData.append('selected_data',JSON.stringify(selectedData));
+    formData.append('contract_id', id);
+
+    
+  datasheetHousingPost(formData, token, id, type).then((data) => {
+    if(data.success==false){
+      // showToastWithGravity(data.message)
+      // alert(data.message)
+      Alert.alert(
+        "Error During Upload",
+        data.message,
+        [
+          {
+            text: "OK",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          
+        ],
+        { cancelable: false }
+      );
+  
+    }
+    else {
+      showToastWithGravity(data.message)
+      props.navigation.navigate('HighwayMenu')
+    }
+  })
+  }
+
+  else {
   let componentData = components.road;
 
   let selectedData = [];
   for(var i=0; i<componentData.length; i++){
     if(componentData[i].amount!="" && componentData[i].qty!="" && componentData[i].unit!=""){
       selectedData.push(componentData[i])
+
     }
     
   }
+  console.log("this is the tyep",type)
   console.log("the selected data", selectedData)
   //datasheetRoadBridgePost
   let formData = new FormData();
@@ -139,6 +188,7 @@ const getDatasheetById = (storageId) => {
     }
   })
 
+  }
 }
 
 

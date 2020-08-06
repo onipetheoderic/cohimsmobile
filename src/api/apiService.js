@@ -128,6 +128,26 @@ export async function hdmiVerifyCodePost(formData, userToken) {
 }
 
 
+export async function datasheetHousingPost(formData, userToken, id, type) {
+    try {
+        let feeds = await fetch(`${baseUrl}upload_datasheet_document_house/${id}/${type}`, {
+            method: 'post',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+        let result = await feeds.json();
+        console.log("loggi", result)
+        feeds = null;
+        return result;
+    } catch (e) {
+        console.warn(e.message)
+    }
+}
+
+
 export async function datasheetRoadBridgePost(formData, userToken) {   
     
     try {
