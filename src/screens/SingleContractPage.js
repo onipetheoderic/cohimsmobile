@@ -243,7 +243,7 @@ for(var i in stages_construction){
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Contract Type</Text>
-            <Text style={[styles.bottomText, {fontSize:14}]}>{singleContract.contract_type} Contract</Text>
+            <Text style={[styles.bottomText, {fontSize:14}]}>{singleContract.contractType} Contract</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Project Length</Text>
@@ -261,17 +261,14 @@ for(var i in stages_construction){
             <Text style={styles.subText}>Zone</Text>
             <Text style={styles.bottomText}>{singleContract.zone}</Text>
         </View>
-        <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
-            <Text style={styles.subText}>Name of Contractor</Text>
-            <Text style={styles.bottomText}>{singleContract.name_of_contractor}</Text>
-        </View>
+     
       </View>
       }
        {!parametersAbsent &&
       <View style={styles.bottomCard}>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Contract Sum</Text>
-            <Text style={styles.bottomText}>₦{currency(singleContract.contractSum)}</Text>
+            <Text style={styles.bottomText}>{currency(singleContract.contractSum)}</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Expected Percentage Delivery</Text>
