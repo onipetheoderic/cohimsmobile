@@ -87,6 +87,12 @@ target 'cohims' do
 
   pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
 
+  pod 'react-native-video', :path => '../node_modules/react-native-video'
+
+  pod 'react-native-keep-awake', :path => '../node_modules/react-native-keep-awake'
+
+  pod 'react-native-orientation', :path => '../node_modules/react-native-orientation'
+
   target 'cohimsTests' do
     inherit! :complete
     # Pods for testing

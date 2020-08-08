@@ -53,7 +53,7 @@ const DashboardScreen = (props) => {
     const {state, dispatch } = globalState;
 
     const handlePress = () => {
-        console.log("all")
+        //console.log("all")
     }
     
     
@@ -89,19 +89,19 @@ useEffect(() => {
             if(parsifiedResult!=null){
               let userDetails = parsifiedResult.userDetails;
               let { user_token } = userDetails;
-              // console.log(user_token)
+              // //console.log(user_token)
               getUserDetail(user_token)
               .then((data) => {
-              // console.log("userfffffl", data)
+              // //console.log("userfffffl", data)
             
               setUser(data.user);
               dispatch({ type: 'newUser',payload:{user:data.user, token:user_token}})
               
               allContractPerformanceWorksState(user_token)
               .then((all_contracts) => {
-                // console.log("XXXXXXXXX", all_contracts)
+                // //console.log("XXXXXXXXX", all_contracts)
                   // if(all_contracts.success==true){
-                  //   console.log("all_contracts graph", all_contracts)
+                  //   //console.log("all_contracts graph", all_contracts)
                   setAllWorksContracts(all_contracts.overalls)
                   setAllStates(all_contracts.states)
                   // }                 
@@ -110,7 +110,7 @@ useEffect(() => {
               setContracts([])
               viewAllContracts(user_token).then((data) => {
                 
-                console.log("all spu Datas", data.spu)
+                //console.log("all spu Datas", data.spu)
                 let housingData = data.housing;
                 let worksData = data.works;
                 let spuData = data.spu == undefined ? [] : data.spu
@@ -151,13 +151,13 @@ const logOut = () => {
 
 const setQuery = (val) => {
  
-  console.log(val.length)
+  //console.log(val.length)
   setSearchValue(val);
   let formData = new FormData();
   formData.append("query", val)
   if(val.length>=3){
     doSearchContract(formData).then((data)=>{
-      console.log(data)
+      //console.log(data)
       if(data.contracts.length && data.contracts.length>0){
         setContracts(data.contracts)
       }

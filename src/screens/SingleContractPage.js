@@ -3,23 +3,40 @@ import React, {useState, useEffect} from 'react';
 import {View, Alert, Text,ScrollView, TouchableOpacity, StatusBar, Dimensions, Image, StyleSheet} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import * as Animatable from 'react-native-animatable';
-
+import Video from 'react-native-video';
+// import Video from 'react-native-af-video-player';
 import { TextInput } from 'react-native-gesture-handler';
 import {Colors} from '../components/colors'
 import SignInButton from '../components/signInButton';
 import { Grid, YAxis, XAxis,StackedBarChart } from 'react-native-svg-charts'  
 import {VictoryLabel, VictoryBar, VictoryPie, VictoryChart, VictoryTheme } from "victory-native";
-import {Contract} from '../api/contract'
+import {Contract} from '../api/contract';
+import truncator from '../helpers/truncator';
+import currency from '../helpers/currency';
 import { getSingleContract, } from '../api/apiService';//accepts id and type
 import {imageUrl} from '../api/constants';
+import MediaControls, { PLAYER_STATES } from 'react-native-media-controls';
 const screenWidth = Dimensions.get("window").width;
 import { NavigationActions, StackActions } from 'react-navigation'
 
 const LoginScreen = (props) => {
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [paused, setPaused] = useState(false);
+    const [playerState, setPlayerState] = useState(PLAYER_STATES.PLAYING);
+
+    const [ total_money_supposed_to_be_spent, changeTotalMoneySpent ] = useState("")
     const [singleContract, changeContract] = useState({})
     const [stages_construction, changeStages] = useState([]);
     const [images, changeImages] = useState([]);
+    const [videos, changeVideos] = useState([]);
+    const [dailyBudget, changeDailyBudget] = useState("");
     const [contracts_handled_by_contractor, changeContractorsProject] = useState([])
+    const [moneyPaidSoFar, changeMoneyPaidSoFar] = useState("");
+    const [supposedPercentage, changeSupposedPercentage] = useState("");
+
     const { width, height } = Dimensions.get('window');
     setTimeout(() => {
         props.navigation.navigate('HomeScreen'); //this.props.navigation.navigate('Login')
@@ -49,48 +66,60 @@ useEffect(() => {
     let id = props.navigation.getParam('id', null);
     console.log("this is the type n id", type_of_project, id)
     getSingleContract(id, type_of_project).then((data)=>{
-        console.log("the data", data)
-        changeImages(data.images);
-        changeContract(data);
-        changeStages(data.stages_construction);
+       
+      
+        console.log("the videos", data.contract_videos)
+        if(data.contract_videos.length!=0){
+            changeVideos(data.contract_videos)
+        }
+       
+
+        changeContractorsProject(JSON.parse(data.allContracts));
+        changeDailyBudget(data.dailyBudget)
+        if(data.contract_images.length!=0){
+            changeImages(data.contract_images);
+        }
+       
+        changeContract(data.data);
+        changeStages(JSON.parse(data.componentData));
+        changeTotalMoneySpent(data.total_money_supposed_to_be_spent);
+        changeMoneyPaidSoFar(data.moneyPaidSoFar);
+        changeSupposedPercentage(data.supposed_percentage)
+
         //"contracts_handled_by_contractor
-        changeContractorsProject(data.contracts_handled_by_contractor);
         
     })
 }, []);
-function truncator(str, length) {
-    var trimmedString = str.substr(0, length);
-    return trimmedString + ".."
-}
 
 
 let parametersAbsent = !Object.keys(singleContract).length;
 
 console.log("from single contract",parametersAbsent)
-console.log("images",images)
-console.log("stages", stages_construction, )
+// console.log("videos",contract_videos)
+
 console.log("contracts_handled_by_contractor", contracts_handled_by_contractor)
 
 const imagePresentChecker = images==undefined?false:true;
 const stagesPresentChecker = stages_construction==undefined?false:true;
 
- function currency(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
+const iscontractorContractPresent = contracts_handled_by_contractor.length==0?false:true;
+
+
   
 const graphDataFormat = [];
 for(var i in stages_construction){
     let format = {
         x: i,
-        y:parseInt(stages_construction[i].value)/50,
-        label:truncator(stages_construction[i].stage, 13)
+        y:parseInt(stages_construction[i].component_score)/50,
+        label:truncator(stages_construction[i].component_name, 13)
     }
-    if(stages_construction[i].value!=undefined)
+    if(stages_construction[i].component_score!=undefined)
     {
         graphDataFormat.push(format)
     }
     
 }
+//https://www.radiantmediaplayer.com/media/big-buck-bunny-360p.mp4
   return (
 
     <ScrollView style={{backgroundColor:'white'}}>
@@ -120,7 +149,7 @@ for(var i in stages_construction){
         {stages_construction.map((stage) =>(
               <Text style={{fontSize:13, marginHorizontal:5, marginVertical:10, fontFamily:'Candara'}}>
               <FontAwesome5 name="location-arrow" size={10} color="#07411D" />
-               {stage.stage} ({stage.value})
+               {stage.component_name} ({stage.component_score})
             </Text>
         ))}
         
@@ -128,9 +157,45 @@ for(var i in stages_construction){
 
       </View>
       }
-      <ScrollView horizontal>
-         
+   
+   <ScrollView>
+   <Text style={{fontFamily:'Candara', fontSize:15}}>Contract Videos</Text>
+          {videos.map((video) =>{
+              return(
+                <View style={{width:'100%'}}>
+                {video.video.map((singleVideo) => (
+        <View style={styles.videoContainer}>
+            <Video
+            paused={true}
+            controls = {true}
+            resizeMode="cover"
+            onLoadStart={() => {console.log("loading started")}} 
+            onLoad={() => {console.log("loading done")}}
+            source={{uri: imageUrl+singleVideo}}                         
+
+            style={styles.video}/>
+            <Text style={{fontFamily:'Candara', fontSize:10}}>{video.comment}</Text>
+        </View>
+                
+                   
+                ))}
+               
+               </View>
+          )})}    
         </ScrollView>
+        {/* <View style={styles.videoContainer}>
+            <Video
+            paused={true}
+            controls = {true}
+            resizeMode="cover"
+            onLoadStart={() => {console.log("loading started")}} 
+            onLoad={() => {console.log("loading done")}}
+            source={{uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'}}                         
+
+            style={styles.video}/>
+        </View>                               */}
+                   
+        
 
        
         {imagePresentChecker &&
@@ -140,16 +205,24 @@ for(var i in stages_construction){
       </View>
 
         <ScrollView horizontal>
-          {images.map((image) => (
-            <View style={styles.eachCard}>
-                <Image source={{uri: imageUrl+image}}
-                    style={{width:200, height:150,resizeMode:'stretch'}}>
-                </Image>
-            </View>
-          ))}       
+          {images.map((image) =>{
+              return(
+                <ScrollView horizontal>
+                {image.image.map((singleImage) => (
+                    <View style={styles.eachCard}>
+                     <Image source={{uri: imageUrl+singleImage}}
+                        style={{width:200, height:150,resizeMode:'stretch'}}>
+                    </Image>
+                <Text style={{fontFamily:'Candara', fontSize:10}}>{image.comment}</Text>
+                    </View>
+                ))}
+               
+               </ScrollView>
+          )})}    
         </ScrollView>
         </View>
     }
+    {iscontractorContractPresent &&
         <View style={{marginLeft:10}}>
         <Text style={{fontFamily:'Candara', textAlign:'center', fontSize:18}}>
             Contracts Handled By Contractor
@@ -157,15 +230,16 @@ for(var i in stages_construction){
             {contracts_handled_by_contractor.map((stage) =>(
                 <Text style={{fontSize:12, marginHorizontal:3, marginVertical:7, fontFamily:'Candara'}}>
                 <FontAwesome5 name="location-arrow" size={10} color="#07411D" />
-                {stage.contract_name} ({stage.state})
+                {stage.name} ({stage.state})({stage.current_percentage}%)
                 </Text>
             ))}
       </View>
+      }
       {!parametersAbsent &&
       <View style={[styles.bottomCard, {marginLeft:20, marginTop:30}]}>
       <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Project Name</Text>
-            <Text style={[styles.bottomText, {fontSize:14}]}>{singleContract.project_name}</Text>
+            <Text style={[styles.bottomText, {fontSize:10}]}>{singleContract.projectTitle}</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Contract Type</Text>
@@ -173,7 +247,7 @@ for(var i in stages_construction){
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Project Length</Text>
-            <Text style={[styles.bottomText, {fontSize:12}]}>{singleContract.project_length}km</Text>
+            <Text style={[styles.bottomText, {fontSize:12}]}>{singleContract.projectLength}km</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>State</Text>
@@ -197,27 +271,27 @@ for(var i in stages_construction){
       <View style={styles.bottomCard}>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Contract Sum</Text>
-            <Text style={styles.bottomText}>₦{currency(singleContract.contract_sum)}</Text>
+            <Text style={styles.bottomText}>₦{currency(singleContract.contractSum)}</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
             <Text style={styles.subText}>Expected Percentage Delivery</Text>
-            <Text style={styles.bottomText}>{singleContract.epd}%</Text>
+            <Text style={styles.bottomText}>{supposedPercentage}%</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
         <Text style={styles.subText}>Current Percentage</Text>
-        <Text style={styles.bottomText}>{Math.round(singleContract.current_percentage)}%</Text>
+        <Text style={styles.bottomText}>{Math.round(singleContract.currentPercentage)}%</Text>
         </View>
           <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}>    
-        <Text style={styles.subText}>Amount Paid So Far</Text>
-        <Text style={styles.bottomText}>₦{currency(singleContract.amount_paid_so_far)}</Text>
+        <Text style={styles.subText}>Amount Certified To Date</Text>
+        <Text style={styles.bottomText}>{currency(singleContract.amountCertifiedToDate)}</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}> 
             <Text style={styles.subText}>Accumulated Daily Budget</Text>
-            <Text style={styles.bottomText}>₦{currency(Math.round(singleContract.accumulated_daily_budget))}</Text>
+            <Text style={styles.bottomText}>{currency(Math.round(total_money_supposed_to_be_spent))}</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal:20}}> 
             <Text style={styles.subText}>Daily Contract Budget</Text>
-            <Text style={styles.bottomText}>₦{singleContract.daily_contract_budget}</Text>
+            <Text style={styles.bottomText}>{currency(Math.round(dailyBudget))}</Text>
         </View>
       </View>
 }
@@ -227,6 +301,16 @@ for(var i in stages_construction){
 };
 
 const styles = StyleSheet.create({
+    videoContainer: {
+        height:200,
+        width:'100%',
+        marginVertical:10,
+        backgroundColor: 'black',
+    },
+    video: {
+        height:200,
+        width:'100%',
+    },
     bottomText: {
         fontFamily:'Candara',
         fontWeight:'bold',
@@ -261,11 +345,11 @@ shadowRadius: 9.11,
 elevation: 8,
     },
     eachCard: {
+        
         margin:10,
-        backgroundColor:Colors.mainGreen, 
         width:200, 
         borderRadius:10,
-        height:150
+        height:200
     },
     default: {
         fontSize:10,
