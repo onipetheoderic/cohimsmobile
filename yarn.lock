@@ -6151,14 +6151,7 @@ react-native-screens@^2.7.0:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.9.0.tgz#ead2843107ba00fee259aa377582e457c74f1f3b"
   integrity sha512-5MaiUD6HA3nzY3JbVI8l3V7pKedtxQF3d8qktTVI0WmWXTI4QzqOU8r8fPVvfKo3MhOXwhWBjr+kQ7DZaIQQeg==
 
-react-native-slider@^0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/react-native-slider/-/react-native-slider-0.11.0.tgz#b68a0bc43c8422b24cd57947cc5ac2bcdb58fadc"
-  integrity sha512-jV9K87eu9uWr0uJIyrSpBLnCKvVlOySC2wynq9TFCdV9oGgjt7Niq8Q1A8R8v+5GHsuBw/s8vEj1AAkkUi+u+w==
-  dependencies:
-    prop-types "^15.5.6"
-
-"react-native-slider@https://github.com/abbasfreestyle/react-native-slider.git":
+react-native-slider@^0.11.0, "react-native-slider@https://github.com/abbasfreestyle/react-native-slider.git":
   version "0.11.0"
   resolved "https://github.com/abbasfreestyle/react-native-slider.git#c53b4965c5e4c3ec258479417898dece367e603e"
   dependencies:
@@ -6232,10 +6225,10 @@ react-native-video@^4.4.5:
     prop-types "^15.5.10"
     shaka-player "^2.4.4"
 
-react-native@0.62.2:
-  version "0.62.2"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.62.2.tgz#d831e11a3178705449142df19a70ac2ca16bad10"
-  integrity sha512-gADZZ3jcm2WFTjh8CCBCbl5wRSbdxqZGd+8UpNwLQFgrkp/uHorwAhLNqcd4+fHmADgPBltNL0uR1Vhv47zcOw==
+react-native@0.62.3:
+  version "0.62.3"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.62.3.tgz#9a2e96af3dedd0723c8657831eec4ed3c30f3299"
+  integrity sha512-b2/hDHDlO5Of2Zn1K5ZgvzOoUrvMEvlYU4miS9rcEBp5jK/9cRQn81HZ7NBmf4gzigGl8CxbSx1l10GUj1k8XQ==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@react-native-community/cli" "^4.5.1"
